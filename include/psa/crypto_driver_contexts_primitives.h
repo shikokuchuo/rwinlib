@@ -35,11 +35,7 @@
 
 #include "psa/crypto_driver_common.h"
 
-/* Include the context structure definitions for the Mbed TLS software drivers */
 #include "psa/crypto_builtin_primitives.h"
-
-/* Include the context structure definitions for those drivers that were
- * declared during the autogeneration process. */
 
 #if defined(MBEDTLS_TEST_LIBTESTDRIVER1)
 #include <libtestdriver1/include/psa/crypto.h>
@@ -88,13 +84,6 @@ typedef struct {
     { 0, MBEDTLS_TRANSPARENT_TEST_DRIVER_CIPHER_OPERATION_INIT }
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
-
-/* Define the context to be used for an operation that is executed through the
- * PSA Driver wrapper layer as the union of all possible driver's contexts.
- *
- * The union members are the driver's context structures, and the member names
- * are formatted as `'drivername'_ctx`. This allows for procedural generation
- * of both this file and the content of psa_crypto_driver_wrappers.c */
 
 typedef union {
     unsigned dummy; /* Make sure this union is always non-empty */

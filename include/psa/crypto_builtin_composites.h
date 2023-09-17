@@ -188,9 +188,6 @@ typedef struct {
 #define MBEDTLS_PSA_BUILTIN_PAKE  1
 #endif
 
-/* Note: the format for mbedtls_ecjpake_read/write function has an extra
- * length byte for each step, plus an extra 3 bytes for ECParameters in the
- * server's 2nd round. */
 #define MBEDTLS_PSA_JPAKE_BUFFER_SIZE ((3 + 1 + 65 + 1 + 65 + 1 + 32) * 2)
 
 typedef struct {

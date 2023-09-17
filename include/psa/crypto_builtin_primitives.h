@@ -36,10 +36,6 @@
 
 #include <psa/crypto_driver_common.h>
 
-/*
- * Hash multi-part operation definitions.
- */
-
 #include "mbedtls/md5.h"
 #include "mbedtls/ripemd160.h"
 #include "mbedtls/sha1.h"
@@ -82,10 +78,6 @@ typedef struct {
 
 #define MBEDTLS_PSA_HASH_OPERATION_INIT { 0, { 0 } }
 
-/*
- * Cipher multi-part operation definitions.
- */
-
 #include "mbedtls/cipher.h"
 
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_STREAM_CIPHER) || \
@@ -99,7 +91,7 @@ typedef struct {
 #endif
 
 typedef struct {
-    /* Context structure for the Mbed TLS cipher implementation. */
+
     psa_algorithm_t MBEDTLS_PRIVATE(alg);
     uint8_t MBEDTLS_PRIVATE(iv_length);
     uint8_t MBEDTLS_PRIVATE(block_length);

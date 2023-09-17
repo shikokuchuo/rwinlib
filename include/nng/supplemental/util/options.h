@@ -17,13 +17,6 @@
 extern "C" {
 #endif
 
-// This is a relatively simple "options parsing" library, used to
-// parse command line options.  We would use getopt(3), but there are
-// two problems with getopt(3).  First, it isn't available on all
-// platforms (especially Win32), and second, it doesn't support long
-// options.  We *exclusively* support long options.  POSIX style
-// short option clustering is *NOT* supported.
-
 struct nng_optspec {
 	const char *o_name;  // Long style name (may be NULL for short only)
 	int         o_short; // Short option (no clustering!)
@@ -33,11 +26,6 @@ struct nng_optspec {
 
 typedef struct nng_optspec nng_optspec;
 
-// Call with *optidx set to 1 to start parsing for a standard program.
-// The val will store the value of the matched "o_val", optarg will be
-// set to match the option string, and optidx will be increment appropriately.
-// Returns -1 when the end of options is reached, 0 on success, or
-// NNG_EINVAL if the option parse is invalid for any reason.
 NNG_DECL int nng_opts_parse(int argc, char *const *argv,
     const nng_optspec *opts, int *val, char **optarg, int *optidx);
 

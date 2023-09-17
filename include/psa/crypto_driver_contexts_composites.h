@@ -36,11 +36,7 @@
 
 #include "psa/crypto_driver_common.h"
 
-/* Include the context structure definitions for the Mbed TLS software drivers */
 #include "psa/crypto_builtin_composites.h"
-
-/* Include the context structure definitions for those drivers that were
- * declared during the autogeneration process. */
 
 #if defined(MBEDTLS_TEST_LIBTESTDRIVER1)
 #include <libtestdriver1/include/psa/crypto.h>

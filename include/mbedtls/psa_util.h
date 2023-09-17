@@ -41,8 +41,6 @@
 
 #include <string.h>
 
-/* Translations for symmetric crypto. */
-
 static inline psa_key_type_t mbedtls_psa_translate_cipher_type(
     mbedtls_cipher_type_t cipher)
 {
@@ -63,21 +61,6 @@ static inline psa_key_type_t mbedtls_psa_translate_cipher_type(
         case MBEDTLS_CIPHER_AES_192_ECB:
         case MBEDTLS_CIPHER_AES_256_ECB:
             return PSA_KEY_TYPE_AES;
-
-        /* ARIA not yet supported in PSA. */
-        /* case MBEDTLS_CIPHER_ARIA_128_CCM:
-           case MBEDTLS_CIPHER_ARIA_192_CCM:
-           case MBEDTLS_CIPHER_ARIA_256_CCM:
-           case MBEDTLS_CIPHER_ARIA_128_CCM_STAR_NO_TAG:
-           case MBEDTLS_CIPHER_ARIA_192_CCM_STAR_NO_TAG:
-           case MBEDTLS_CIPHER_ARIA_256_CCM_STAR_NO_TAG:
-           case MBEDTLS_CIPHER_ARIA_128_GCM:
-           case MBEDTLS_CIPHER_ARIA_192_GCM:
-           case MBEDTLS_CIPHER_ARIA_256_GCM:
-           case MBEDTLS_CIPHER_ARIA_128_CBC:
-           case MBEDTLS_CIPHER_ARIA_192_CBC:
-           case MBEDTLS_CIPHER_ARIA_256_CBC:
-               return( PSA_KEY_TYPE_ARIA ); */
 
         default:
             return 0;
@@ -120,11 +103,6 @@ static inline psa_key_usage_t mbedtls_psa_translate_cipher_operation(
     }
 }
 
-/* Translations for hashing. */
-
-/* Note: this function should not be used from inside the library, use
- * mbedtls_hash_info_psa_from_md() from the internal hash_info.h instead.
- * It is kept only for compatibility in case applications were using it. */
 static inline psa_algorithm_t mbedtls_psa_translate_md(mbedtls_md_type_t md_alg)
 {
     switch (md_alg) {
@@ -162,8 +140,6 @@ static inline psa_algorithm_t mbedtls_psa_translate_md(mbedtls_md_type_t md_alg)
             return 0;
     }
 }
-
-/* Translations for ECC. */
 
 static inline int mbedtls_psa_get_ecc_oid_from_id(
     psa_ecc_family_t curve, size_t bits,
@@ -260,71 +236,14 @@ static inline int mbedtls_psa_get_ecc_oid_from_id(
 #define MBEDTLS_PSA_MAX_EC_KEY_PAIR_LENGTH \
     PSA_KEY_EXPORT_ECC_KEY_PAIR_MAX_SIZE(PSA_VENDOR_ECC_MAX_CURVE_BITS)
 
-/* Expose whatever RNG the PSA subsystem uses to applications using the
- * mbedtls_xxx API. The declarations and definitions here need to be
- * consistent with the implementation in library/psa_crypto_random_impl.h.
- * See that file for implementation documentation. */
-
-
-/* The type of a `f_rng` random generator function that many library functions
- * take.
- *
- * This type name is not part of the Mbed TLS stable API. It may be renamed
- * or moved without warning.
- */
 typedef int mbedtls_f_rng_t(void *p_rng, unsigned char *output, size_t output_size);
 
 #if defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG)
 
-/** The random generator function for the PSA subsystem.
- *
- * This function is suitable as the `f_rng` random generator function
- * parameter of many `mbedtls_xxx` functions. Use #MBEDTLS_PSA_RANDOM_STATE
- * to obtain the \p p_rng parameter.
- *
- * The implementation of this function depends on the configuration of the
- * library.
- *
- * \note Depending on the configuration, this may be a function or
- *       a pointer to a function.
- *
- * \note This function may only be used if the PSA crypto subsystem is active.
- *       This means that you must call psa_crypto_init() before any call to
- *       this function, and you must not call this function after calling
- *       mbedtls_psa_crypto_free().
- *
- * \param p_rng         The random generator context. This must be
- *                      #MBEDTLS_PSA_RANDOM_STATE. No other state is
- *                      supported.
- * \param output        The buffer to fill. It must have room for
- *                      \c output_size bytes.
- * \param output_size   The number of bytes to write to \p output.
- *                      This function may fail if \p output_size is too
- *                      large. It is guaranteed to accept any output size
- *                      requested by Mbed TLS library functions. The
- *                      maximum request size depends on the library
- *                      configuration.
- *
- * \return              \c 0 on success.
- * \return              An `MBEDTLS_ERR_ENTROPY_xxx`,
- *                      `MBEDTLS_ERR_PLATFORM_xxx,
- *                      `MBEDTLS_ERR_CTR_DRBG_xxx` or
- *                      `MBEDTLS_ERR_HMAC_DRBG_xxx` on error.
- */
 int mbedtls_psa_get_random(void *p_rng,
                            unsigned char *output,
                            size_t output_size);
 
-/** The random generator state for the PSA subsystem.
- *
- * This macro expands to an expression which is suitable as the `p_rng`
- * random generator state parameter of many `mbedtls_xxx` functions.
- * It must be used in combination with the random generator function
- * mbedtls_psa_get_random().
- *
- * The implementation of this macro depends on the configuration of the
- * library. Do not make any assumption on its nature.
- */
 #define MBEDTLS_PSA_RANDOM_STATE NULL
 
 #else /* !defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG) */
@@ -371,23 +290,15 @@ extern const mbedtls_error_pair_t psa_to_pk_rsa_errors[8];
 extern const mbedtls_error_pair_t psa_to_pk_ecdsa_errors[7];
 #endif
 
-/* Generic fallback function for error translation,
- * when the received state was not module-specific. */
 int psa_generic_status_to_mbedtls(psa_status_t status);
 
-/* This function iterates over provided local error translations,
- * and if no match was found - calls the fallback error translation function. */
 int psa_status_to_mbedtls(psa_status_t status,
                           const mbedtls_error_pair_t *local_translations,
                           size_t local_errors_num,
                           int (*fallback_f)(psa_status_t));
 
-/* The second out of three-stage error handling functions of the pk module,
- * acts as a fallback after RSA / ECDSA error translation, and if no match
- * is found, it itself calls psa_generic_status_to_mbedtls. */
 int psa_pk_status_to_mbedtls(psa_status_t status);
 
-/* Utility macro to shorten the defines of error translator in modules. */
 #define PSA_TO_MBEDTLS_ERR_LIST(status, error_list, fallback_f)       \
     psa_status_to_mbedtls(status, error_list,                         \
                           sizeof(error_list)/sizeof(error_list[0]),   \

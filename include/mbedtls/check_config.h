@@ -23,11 +23,6 @@
 #ifndef MBEDTLS_CHECK_CONFIG_H
 #define MBEDTLS_CHECK_CONFIG_H
 
-/* *INDENT-OFF* */
-/*
- * We assume CHAR_BIT is 8 in many places. In practice, this is true on our
- * target platforms, so not an issue, but let's just be extra sure.
- */
 #include <limits.h>
 #if CHAR_BIT != 8
 #error "mbed TLS requires a platform with 8-bit chars"
@@ -40,8 +35,6 @@
 #error "MBEDTLS_PLATFORM_C is required on Windows"
 #endif
 
-/* Fix the config here. Not convenient to put an #ifdef _WIN32 in mbedtls_config.h as
- * it would confuse config.py. */
 #if !defined(MBEDTLS_PLATFORM_SNPRINTF_ALT) && \
     !defined(MBEDTLS_PLATFORM_SNPRINTF_MACRO)
 #define MBEDTLS_PLATFORM_SNPRINTF_ALT
@@ -278,7 +271,6 @@
 #error "MBEDTLS_HMAC_DRBG_C defined, but not all prerequisites"
 #endif
 
-/* Helper for ECDSA dependencies, will be undefined at the end of the file */
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
 #if defined(PSA_HAVE_FULL_ECDSA)
 #define MBEDTLS_PK_HAVE_ECDSA
@@ -289,7 +281,6 @@
 #endif
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
 
-/* Helper for JPAKE dependencies, will be undefined at the end of the file */
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
 #if defined(PSA_HAVE_FULL_JPAKE)
 #define MBEDTLS_PK_HAVE_JPAKE
@@ -359,9 +350,6 @@
 #error "MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED defined, but not all prerequisites"
 #endif
 
-/* Use of EC J-PAKE in TLS requires SHA-256.
- * This will be taken from MD if it is present, or from PSA if MD is absent.
- * Note: MBEDTLS_ECJPAKE_C depends on MBEDTLS_MD_C || MBEDTLS_PSA_CRYPTO_C. */
 #if defined(MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED) &&                    \
     !( defined(MBEDTLS_MD_C) && defined(MBEDTLS_SHA256_C) ) &&          \
     !( !defined(MBEDTLS_MD_C) && defined(PSA_WANT_ALG_SHA_256) )
@@ -768,22 +756,18 @@
 #error "MBEDTLS_SSL_PROTO_TLS1_2 defined, but not all prerequisites"
 #endif
 
-/* TLS 1.3 requires separate HKDF parts from PSA */
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3) && \
         !( defined(MBEDTLS_PSA_CRYPTO_C) && defined(PSA_WANT_ALG_HKDF_EXTRACT) && defined(PSA_WANT_ALG_HKDF_EXPAND) )
 #error "MBEDTLS_SSL_PROTO_TLS1_3 defined, but not all prerequisites"
 #endif
 
-/* TLS 1.3 requires at least one ciphersuite, so at least SHA-256 or SHA-384 */
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3)
-/* We always need at least one of the hashes via PSA (for use with HKDF) */
+
 #if !( defined(PSA_WANT_ALG_SHA_256) || defined(PSA_WANT_ALG_SHA_384) )
 #error "MBEDTLS_SSL_PROTO_TLS1_3 defined, but not all prerequisites"
 #endif /* !(PSA_WANT_ALG_SHA_256 || PSA_WANT_ALG_SHA_384) */
 #if !defined(MBEDTLS_USE_PSA_CRYPTO)
-/* When USE_PSA_CRYPTO is not defined, we also need SHA-256 or SHA-384 via the
- * legacy interface, including via the MD layer, for the parts of the code
- * that are shared with TLS 1.2 (running handshake hash). */
+
 #if !defined(MBEDTLS_MD_C) || \
     !( defined(MBEDTLS_SHA256_C) || defined(MBEDTLS_SHA384_C) )
 #error "MBEDTLS_SSL_PROTO_TLS1_3 defined, but not all prerequisites"
@@ -804,9 +788,6 @@
 #endif
 #endif
 
-/*
- * The current implementation of TLS 1.3 requires MBEDTLS_SSL_KEEP_PEER_CERTIFICATE.
- */
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3) && !defined(MBEDTLS_SSL_KEEP_PEER_CERTIFICATE)
 #error "MBEDTLS_SSL_PROTO_TLS1_3 defined without MBEDTLS_SSL_KEEP_PEER_CERTIFICATE"
 #endif
@@ -1038,50 +1019,47 @@
 #error "MBEDTLS_SSL_CONTEXT_SERIALIZATION defined, but not all prerequisites"
 #endif
 
-/* Reject attempts to enable options that have been removed and that could
- * cause a build to succeed but with features removed. */
-
-#if defined(MBEDTLS_HAVEGE_C) //no-check-names
+#if defined(MBEDTLS_HAVEGE_C)
 #error "MBEDTLS_HAVEGE_C was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/2599"
 #endif
 
-#if defined(MBEDTLS_SSL_HW_RECORD_ACCEL) //no-check-names
+#if defined(MBEDTLS_SSL_HW_RECORD_ACCEL)
 #error "MBEDTLS_SSL_HW_RECORD_ACCEL was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4031"
 #endif
 
-#if defined(MBEDTLS_SSL_PROTO_SSL3) //no-check-names
+#if defined(MBEDTLS_SSL_PROTO_SSL3)
 #error "MBEDTLS_SSL_PROTO_SSL3 (SSL v3.0 support) was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4031"
 #endif
 
-#if defined(MBEDTLS_SSL_SRV_SUPPORT_SSLV2_CLIENT_HELLO) //no-check-names
+#if defined(MBEDTLS_SSL_SRV_SUPPORT_SSLV2_CLIENT_HELLO)
 #error "MBEDTLS_SSL_SRV_SUPPORT_SSLV2_CLIENT_HELLO (SSL v2 ClientHello support) was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4031"
 #endif
 
-#if defined(MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT) //no-check-names
+#if defined(MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT)
 #error "MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT (compatibility with the buggy implementation of truncated HMAC in Mbed TLS up to 2.7) was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4031"
 #endif
 
-#if defined(MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES) //no-check-names
+#if defined(MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES)
 #error "MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES was removed in Mbed TLS 3.0. See the ChangeLog entry if you really need SHA-1-signed certificates."
 #endif
 
-#if defined(MBEDTLS_ZLIB_SUPPORT) //no-check-names
+#if defined(MBEDTLS_ZLIB_SUPPORT)
 #error "MBEDTLS_ZLIB_SUPPORT was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4031"
 #endif
 
-#if defined(MBEDTLS_CHECK_PARAMS) //no-check-names
+#if defined(MBEDTLS_CHECK_PARAMS)
 #error "MBEDTLS_CHECK_PARAMS was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4313"
 #endif
 
-#if defined(MBEDTLS_SSL_CID_PADDING_GRANULARITY) //no-check-names
+#if defined(MBEDTLS_SSL_CID_PADDING_GRANULARITY)
 #error "MBEDTLS_SSL_CID_PADDING_GRANULARITY was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4335"
 #endif
 
-#if defined(MBEDTLS_SSL_TLS1_3_PADDING_GRANULARITY) //no-check-names
+#if defined(MBEDTLS_SSL_TLS1_3_PADDING_GRANULARITY)
 #error "MBEDTLS_SSL_TLS1_3_PADDING_GRANULARITY was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4335"
 #endif
 
-#if defined(MBEDTLS_SSL_TRUNCATED_HMAC) //no-check-names
+#if defined(MBEDTLS_SSL_TRUNCATED_HMAC)
 #error "MBEDTLS_SSL_TRUNCATED_HMAC was removed in Mbed TLS 3.0. See https://github.com/Mbed-TLS/mbedtls/issues/4341"
 #endif
 
@@ -1093,16 +1071,9 @@
 #error  "MBEDTLS_PKCS7_C is defined, but not all prerequisites"
 #endif
 
-/* Undefine helper symbols */
 #undef MBEDTLS_PK_HAVE_ECDSA
 #undef MBEDTLS_PK_HAVE_JPAKE
 
-/*
- * Avoid warning from -pedantic. This is a convenient place for this
- * workaround since this is included by every single file before the
- * #if defined(MBEDTLS_xxx_C) that results in empty translation units.
- */
 typedef int mbedtls_iso_c_forbids_empty_translation_units;
 
-/* *INDENT-ON* */
 #endif /* MBEDTLS_CHECK_CONFIG_H */

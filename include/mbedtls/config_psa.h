@@ -46,12 +46,6 @@
 extern "C" {
 #endif
 
-
-
-/****************************************************************/
-/* De facto synonyms */
-/****************************************************************/
-
 #if defined(PSA_WANT_ALG_ECDSA_ANY) && !defined(PSA_WANT_ALG_ECDSA)
 #define PSA_WANT_ALG_ECDSA PSA_WANT_ALG_ECDSA_ANY
 #elif !defined(PSA_WANT_ALG_ECDSA_ANY) && defined(PSA_WANT_ALG_ECDSA)
@@ -75,12 +69,6 @@ extern "C" {
 #elif !defined(PSA_WANT_ALG_RSA_PSS_ANY_SALT) && defined(PSA_WANT_ALG_RSA_PSS)
 #define PSA_WANT_ALG_RSA_PSS_ANY_SALT PSA_WANT_ALG_RSA_PSS
 #endif
-
-
-
-/****************************************************************/
-/* Require built-in implementations based on PSA requirements */
-/****************************************************************/
 
 #if defined(MBEDTLS_PSA_CRYPTO_CONFIG)
 
@@ -290,9 +278,6 @@ extern "C" {
 #endif /* !MBEDTLS_PSA_ACCEL_KEY_TYPE_RSA_PUBLIC_KEY */
 #endif /* PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY */
 
-/* If any of the block modes are requested that don't have an
- * associated HW assist, define PSA_HAVE_SOFT_BLOCK_MODE for checking
- * in the block cipher key types. */
 #if (defined(PSA_WANT_ALG_CTR) && !defined(MBEDTLS_PSA_ACCEL_ALG_CTR)) || \
     (defined(PSA_WANT_ALG_CFB) && !defined(MBEDTLS_PSA_ACCEL_ALG_CFB)) || \
     (defined(PSA_WANT_ALG_OFB) && !defined(MBEDTLS_PSA_ACCEL_ALG_OFB)) || \
@@ -550,10 +535,6 @@ extern "C" {
 
 #if defined(PSA_WANT_ECC_SECP_K1_224)
 #if !defined(MBEDTLS_PSA_ACCEL_ECC_SECP_K1_224)
-/*
- * SECP224K1 is buggy via the PSA API in Mbed TLS
- * (https://github.com/Mbed-TLS/mbedtls/issues/3541).
- */
 #error "SECP224K1 is buggy via the PSA API in Mbed TLS."
 #define MBEDTLS_ECP_DP_SECP224K1_ENABLED
 #define MBEDTLS_PSA_BUILTIN_ECC_SECP_K1_224 1
@@ -567,18 +548,7 @@ extern "C" {
 #endif /* !MBEDTLS_PSA_ACCEL_ECC_SECP_K1_256 */
 #endif /* PSA_WANT_ECC_SECP_K1_256 */
 
-
-
-/****************************************************************/
-/* Infer PSA requirements from Mbed TLS capabilities */
-/****************************************************************/
-
 #else /* MBEDTLS_PSA_CRYPTO_CONFIG */
-
-/*
- * Ensure PSA_WANT_* defines are setup properly if MBEDTLS_PSA_CRYPTO_CONFIG
- * is not defined
- */
 
 #if defined(MBEDTLS_CCM_C)
 #define MBEDTLS_PSA_BUILTIN_ALG_CCM 1
@@ -602,7 +572,6 @@ extern "C" {
 #define PSA_WANT_ALG_ECDSA 1
 #define PSA_WANT_ALG_ECDSA_ANY 1
 
-// Only add in DETERMINISTIC support if ECDSA is also enabled
 #if defined(MBEDTLS_ECDSA_DETERMINISTIC)
 #define MBEDTLS_PSA_BUILTIN_ALG_DETERMINISTIC_ECDSA 1
 #define PSA_WANT_ALG_DETERMINISTIC_ECDSA 1
@@ -622,10 +591,6 @@ extern "C" {
 #define PSA_WANT_ALG_GCM 1
 #endif /* MBEDTLS_GCM_C */
 
-/* Enable PSA HKDF algorithm if mbedtls HKDF is supported.
- * PSA HKDF EXTRACT and PSA HKDF EXPAND have minimal cost when
- * PSA HKDF is enabled, so enable both algorithms together
- * with PSA HKDF. */
 #if defined(MBEDTLS_HKDF_C)
 #define MBEDTLS_PSA_BUILTIN_ALG_HMAC 1
 #define PSA_WANT_ALG_HMAC 1
@@ -830,7 +795,6 @@ extern "C" {
 #define PSA_WANT_ECC_SECP_K1_192
 #endif
 
-/* SECP224K1 is buggy via the PSA API (https://github.com/Mbed-TLS/mbedtls/issues/3541) */
 #if 0 && defined(MBEDTLS_ECP_DP_SECP224K1_ENABLED)
 #define MBEDTLS_PSA_BUILTIN_ECC_SECP_K1_224 1
 #define PSA_WANT_ECC_SECP_K1_224
@@ -853,7 +817,6 @@ extern "C" {
 #define PSA_HAVE_FULL_JPAKE 1
 #endif
 
-/* These features are always enabled. */
 #define PSA_WANT_KEY_TYPE_DERIVE 1
 #define PSA_WANT_KEY_TYPE_PASSWORD 1
 #define PSA_WANT_KEY_TYPE_PASSWORD_HASH 1
