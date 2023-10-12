@@ -42,16 +42,12 @@
 #define MBEDTLS_GCM_DECRYPT     0
 
 #define MBEDTLS_ERR_GCM_AUTH_FAILED                       -0x0012
-
 #define MBEDTLS_ERR_GCM_BAD_INPUT                         -0x0014
-
 #define MBEDTLS_ERR_GCM_BUFFER_TOO_SMALL                  -0x0016
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#if !defined(MBEDTLS_GCM_ALT)
 
 typedef struct mbedtls_gcm_context {
     mbedtls_cipher_context_t MBEDTLS_PRIVATE(cipher_ctx);
@@ -65,10 +61,6 @@ typedef struct mbedtls_gcm_context {
     int MBEDTLS_PRIVATE(mode);
 }
 mbedtls_gcm_context;
-
-#else  /* !MBEDTLS_GCM_ALT */
-#include "gcm_alt.h"
-#endif /* !MBEDTLS_GCM_ALT */
 
 void mbedtls_gcm_init(mbedtls_gcm_context *ctx);
 

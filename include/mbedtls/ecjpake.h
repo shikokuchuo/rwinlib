@@ -35,9 +35,8 @@ extern "C" {
 typedef enum {
     MBEDTLS_ECJPAKE_CLIENT = 0,
     MBEDTLS_ECJPAKE_SERVER,
+    MBEDTLS_ECJPAKE_NONE,
 } mbedtls_ecjpake_role;
-
-#if !defined(MBEDTLS_ECJPAKE_ALT)
 
 typedef struct mbedtls_ecjpake_context {
     mbedtls_md_type_t MBEDTLS_PRIVATE(md_type);
@@ -56,10 +55,6 @@ typedef struct mbedtls_ecjpake_context {
 
     mbedtls_mpi MBEDTLS_PRIVATE(s);
 } mbedtls_ecjpake_context;
-
-#else  /* MBEDTLS_ECJPAKE_ALT */
-#include "ecjpake_alt.h"
-#endif /* MBEDTLS_ECJPAKE_ALT */
 
 void mbedtls_ecjpake_init(mbedtls_ecjpake_context *ctx);
 

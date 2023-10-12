@@ -47,29 +47,17 @@
 #include <stdint.h>
 
 #define MBEDTLS_ERR_NET_SOCKET_FAILED                     -0x0042
-
 #define MBEDTLS_ERR_NET_CONNECT_FAILED                    -0x0044
-
 #define MBEDTLS_ERR_NET_BIND_FAILED                       -0x0046
-
 #define MBEDTLS_ERR_NET_LISTEN_FAILED                     -0x0048
-
 #define MBEDTLS_ERR_NET_ACCEPT_FAILED                     -0x004A
-
 #define MBEDTLS_ERR_NET_RECV_FAILED                       -0x004C
-
 #define MBEDTLS_ERR_NET_SEND_FAILED                       -0x004E
-
 #define MBEDTLS_ERR_NET_CONN_RESET                        -0x0050
-
 #define MBEDTLS_ERR_NET_UNKNOWN_HOST                      -0x0052
-
 #define MBEDTLS_ERR_NET_BUFFER_TOO_SMALL                  -0x0043
-
 #define MBEDTLS_ERR_NET_INVALID_CONTEXT                   -0x0045
-
 #define MBEDTLS_ERR_NET_POLL_FAILED                       -0x0047
-
 #define MBEDTLS_ERR_NET_BAD_INPUT_DATA                    -0x0049
 
 #define MBEDTLS_NET_LISTEN_BACKLOG         10

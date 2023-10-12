@@ -27,13 +27,17 @@
 
 #include <stddef.h>
 
-#if defined(MBEDTLS_SHA512_C) && !defined(MBEDTLS_ENTROPY_FORCE_SHA256)
-#include "mbedtls/sha512.h"
+#include "md.h"
+
+#if defined(MBEDTLS_MD_CAN_SHA512) && !defined(MBEDTLS_ENTROPY_FORCE_SHA256)
 #define MBEDTLS_ENTROPY_SHA512_ACCUMULATOR
+#define MBEDTLS_ENTROPY_MD  MBEDTLS_MD_SHA512
+#define MBEDTLS_ENTROPY_BLOCK_SIZE      64
 #else
-#if defined(MBEDTLS_SHA256_C)
+#if defined(MBEDTLS_MD_CAN_SHA256)
 #define MBEDTLS_ENTROPY_SHA256_ACCUMULATOR
-#include "mbedtls/sha256.h"
+#define MBEDTLS_ENTROPY_MD  MBEDTLS_MD_SHA256
+#define MBEDTLS_ENTROPY_BLOCK_SIZE      32
 #endif
 #endif
 
@@ -42,13 +46,9 @@
 #endif
 
 #define MBEDTLS_ERR_ENTROPY_SOURCE_FAILED                 -0x003C
-
 #define MBEDTLS_ERR_ENTROPY_MAX_SOURCES                   -0x003E
-
 #define MBEDTLS_ERR_ENTROPY_NO_SOURCES_DEFINED            -0x0040
-
 #define MBEDTLS_ERR_ENTROPY_NO_STRONG_SOURCE              -0x003D
-
 #define MBEDTLS_ERR_ENTROPY_FILE_IO_ERROR                 -0x003F
 
 #if !defined(MBEDTLS_ENTROPY_MAX_SOURCES)
@@ -57,12 +57,6 @@
 
 #if !defined(MBEDTLS_ENTROPY_MAX_GATHER)
 #define MBEDTLS_ENTROPY_MAX_GATHER      128
-#endif
-
-#if defined(MBEDTLS_ENTROPY_SHA512_ACCUMULATOR)
-#define MBEDTLS_ENTROPY_BLOCK_SIZE      64
-#else
-#define MBEDTLS_ENTROPY_BLOCK_SIZE      32
 #endif
 
 #define MBEDTLS_ENTROPY_MAX_SEED_SIZE   1024
@@ -88,12 +82,8 @@ typedef struct mbedtls_entropy_source_state {
 mbedtls_entropy_source_state;
 
 typedef struct mbedtls_entropy_context {
+    mbedtls_md_context_t  MBEDTLS_PRIVATE(accumulator);
     int MBEDTLS_PRIVATE(accumulator_started);
-#if defined(MBEDTLS_ENTROPY_SHA512_ACCUMULATOR)
-    mbedtls_sha512_context  MBEDTLS_PRIVATE(accumulator);
-#elif defined(MBEDTLS_ENTROPY_SHA256_ACCUMULATOR)
-    mbedtls_sha256_context  MBEDTLS_PRIVATE(accumulator);
-#endif
     int             MBEDTLS_PRIVATE(source_count);
     mbedtls_entropy_source_state    MBEDTLS_PRIVATE(source)[MBEDTLS_ENTROPY_MAX_SOURCES];
 #if defined(MBEDTLS_THREADING_C)

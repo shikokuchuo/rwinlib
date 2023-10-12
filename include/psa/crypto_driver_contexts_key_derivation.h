@@ -1,7 +1,7 @@
 /*
  *  Declaration of context structures for use with the PSA driver wrapper
- *  interface. This file contains the context structures for 'primitive'
- *  operations, i.e. those operations which do not rely on other contexts.
+ *  interface. This file contains the context structures for key derivation
+ *  operations.
  *
  *  Warning: This file will be auto-generated in the future.
  *
@@ -30,29 +30,31 @@
  *  limitations under the License.
  */
 
-#ifndef PSA_CRYPTO_DRIVER_CONTEXTS_PRIMITIVES_H
-#define PSA_CRYPTO_DRIVER_CONTEXTS_PRIMITIVES_H
+#ifndef PSA_CRYPTO_DRIVER_CONTEXTS_KEY_DERIVATION_H
+#define PSA_CRYPTO_DRIVER_CONTEXTS_KEY_DERIVATION_H
 
 #include "psa/crypto_driver_common.h"
 
-#include "psa/crypto_builtin_primitives.h"
+#include "psa/crypto_builtin_key_derivation.h"
 
 typedef union {
     unsigned dummy;
-    mbedtls_psa_hash_operation_t mbedtls_ctx;
-#if defined(PSA_CRYPTO_DRIVER_TEST)
-    mbedtls_transparent_test_driver_hash_operation_t test_driver_ctx;
+#if defined(MBEDTLS_PSA_BUILTIN_ALG_HKDF) || \
+    defined(MBEDTLS_PSA_BUILTIN_ALG_HKDF_EXTRACT) || \
+    defined(MBEDTLS_PSA_BUILTIN_ALG_HKDF_EXPAND)
+    psa_hkdf_key_derivation_t MBEDTLS_PRIVATE(hkdf);
 #endif
-} psa_driver_hash_context_t;
-
-typedef union {
-    unsigned dummy;
-    mbedtls_psa_cipher_operation_t mbedtls_ctx;
-#if defined(PSA_CRYPTO_DRIVER_TEST)
-    mbedtls_transparent_test_driver_cipher_operation_t transparent_test_driver_ctx;
-    mbedtls_opaque_test_driver_cipher_operation_t opaque_test_driver_ctx;
+#if defined(MBEDTLS_PSA_BUILTIN_ALG_TLS12_PRF) || \
+    defined(MBEDTLS_PSA_BUILTIN_ALG_TLS12_PSK_TO_MS)
+    psa_tls12_prf_key_derivation_t MBEDTLS_PRIVATE(tls12_prf);
 #endif
-} psa_driver_cipher_context_t;
+#if defined(MBEDTLS_PSA_BUILTIN_ALG_TLS12_ECJPAKE_TO_PMS)
+    psa_tls12_ecjpake_to_pms_t MBEDTLS_PRIVATE(tls12_ecjpake_to_pms);
+#endif
+#if defined(PSA_HAVE_SOFT_PBKDF2)
+    psa_pbkdf2_key_derivation_t MBEDTLS_PRIVATE(pbkdf2);
+#endif
+} psa_driver_key_derivation_context_t;
 
-#endif /* PSA_CRYPTO_DRIVER_CONTEXTS_PRIMITIVES_H */
+#endif /* PSA_CRYPTO_DRIVER_CONTEXTS_KEY_DERIVATION_H */
 /* End of automatically generated file. */

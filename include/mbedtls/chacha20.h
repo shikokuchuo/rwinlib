@@ -44,18 +44,12 @@
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_CHACHA20_ALT)
-
 typedef struct mbedtls_chacha20_context {
     uint32_t MBEDTLS_PRIVATE(state)[16];
     uint8_t  MBEDTLS_PRIVATE(keystream8)[64];
     size_t MBEDTLS_PRIVATE(keystream_bytes_used);
 }
 mbedtls_chacha20_context;
-
-#else  /* MBEDTLS_CHACHA20_ALT */
-#include "chacha20_alt.h"
-#endif /* MBEDTLS_CHACHA20_ALT */
 
 void mbedtls_chacha20_init(mbedtls_chacha20_context *ctx);
 

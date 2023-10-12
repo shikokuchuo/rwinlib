@@ -37,9 +37,9 @@
 #include "mbedtls/md.h"
 
 #define MBEDTLS_ECDSA_MAX_SIG_LEN(bits)                               \
-    (/*T,L of SEQUENCE*/ ((bits) >= 61 * 8 ? 3 : 2) +              \
-     /*T,L of r,s*/ 2 * (((bits) >= 127 * 8 ? 3 : 2) +     \
-                         /*V of r,s*/ ((bits) + 8) / 8))
+    (((bits) >= 61 * 8 ? 3 : 2) +              \
+     2 * (((bits) >= 127 * 8 ? 3 : 2) +     \
+     ((bits) + 8) / 8))
 
 #define MBEDTLS_ECDSA_MAX_LEN  MBEDTLS_ECDSA_MAX_SIG_LEN(MBEDTLS_ECP_MAX_BITS)
 
@@ -104,6 +104,8 @@ int mbedtls_ecdsa_sign_restartable(
     void *p_rng_blind,
     mbedtls_ecdsa_restart_ctx *rs_ctx);
 
+#endif /* !MBEDTLS_ECDSA_SIGN_ALT */
+
 #if defined(MBEDTLS_ECDSA_DETERMINISTIC)
 
 int mbedtls_ecdsa_sign_det_restartable(
@@ -116,8 +118,6 @@ int mbedtls_ecdsa_sign_det_restartable(
     mbedtls_ecdsa_restart_ctx *rs_ctx);
 
 #endif /* MBEDTLS_ECDSA_DETERMINISTIC */
-
-#endif /* !MBEDTLS_ECDSA_SIGN_ALT */
 
 int mbedtls_ecdsa_verify(mbedtls_ecp_group *grp,
                          const unsigned char *buf, size_t blen,

@@ -34,9 +34,7 @@
 #define PSA_CRYPTO_PLATFORM_H
 #include "mbedtls/private_access.h"
 
-#include "mbedtls/build_info.h"
-
-#include "mbedtls/config_psa.h"
+#include "psa/build_info.h"
 
 #include <stdint.h>
 

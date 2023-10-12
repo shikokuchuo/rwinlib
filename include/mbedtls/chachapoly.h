@@ -38,7 +38,6 @@
 #include "mbedtls/poly1305.h"
 
 #define MBEDTLS_ERR_CHACHAPOLY_BAD_STATE            -0x0054
-
 #define MBEDTLS_ERR_CHACHAPOLY_AUTH_FAILED          -0x0056
 
 #ifdef __cplusplus
@@ -51,8 +50,6 @@ typedef enum {
 }
 mbedtls_chachapoly_mode_t;
 
-#if !defined(MBEDTLS_CHACHAPOLY_ALT)
-
 #include "mbedtls/chacha20.h"
 
 typedef struct mbedtls_chachapoly_context {
@@ -64,10 +61,6 @@ typedef struct mbedtls_chachapoly_context {
     mbedtls_chachapoly_mode_t MBEDTLS_PRIVATE(mode);
 }
 mbedtls_chachapoly_context;
-
-#else /* !MBEDTLS_CHACHAPOLY_ALT */
-#include "chachapoly_alt.h"
-#endif /* !MBEDTLS_CHACHAPOLY_ALT */
 
 void mbedtls_chachapoly_init(mbedtls_chachapoly_context *ctx);
 

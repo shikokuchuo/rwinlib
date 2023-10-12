@@ -37,7 +37,6 @@
 #include "mbedtls/md.h"
 
 #define MBEDTLS_ERR_OID_NOT_FOUND                         -0x002E
-
 #define MBEDTLS_ERR_OID_BUF_TOO_SMALL                     -0x000B
 
 #define MBEDTLS_OID_X509_EXT_AUTHORITY_KEY_IDENTIFIER    (1 << 0)
@@ -57,6 +56,8 @@
 #define MBEDTLS_OID_X509_EXT_FRESHEST_CRL                (1 << 14)
 #define MBEDTLS_OID_X509_EXT_NS_CERT_TYPE                (1 << 16)
 
+#define MBEDTLS_OID_MAX_COMPONENTS              128
+
 #define MBEDTLS_OID_ISO_MEMBER_BODIES           "\x2a"
 #define MBEDTLS_OID_ISO_IDENTIFIED_ORG          "\x2b"
 #define MBEDTLS_OID_ISO_CCITT_DS                "\x55"
@@ -75,6 +76,9 @@
 #define MBEDTLS_OID_OIW_SECSIG                  MBEDTLS_OID_ORG_OIW "\x03"
 #define MBEDTLS_OID_OIW_SECSIG_ALG              MBEDTLS_OID_OIW_SECSIG "\x02"
 #define MBEDTLS_OID_OIW_SECSIG_SHA1             MBEDTLS_OID_OIW_SECSIG_ALG "\x1a"
+#define MBEDTLS_OID_ORG_THAWTE                  "\x65"
+#define MBEDTLS_OID_THAWTE                      MBEDTLS_OID_ISO_IDENTIFIED_ORG \
+        MBEDTLS_OID_ORG_THAWTE
 #define MBEDTLS_OID_ORG_CERTICOM                "\x81\x04"
 #define MBEDTLS_OID_CERTICOM                    MBEDTLS_OID_ISO_IDENTIFIED_ORG \
         MBEDTLS_OID_ORG_CERTICOM
@@ -204,6 +208,15 @@
 
 #define MBEDTLS_OID_DIGEST_ALG_RIPEMD160        MBEDTLS_OID_TELETRUST "\x03\x02\x01"
 
+#define MBEDTLS_OID_DIGEST_ALG_SHA3_224         MBEDTLS_OID_NIST_ALG "\x02\x07"
+
+#define MBEDTLS_OID_DIGEST_ALG_SHA3_256         MBEDTLS_OID_NIST_ALG "\x02\x08"
+
+#define MBEDTLS_OID_DIGEST_ALG_SHA3_384         MBEDTLS_OID_NIST_ALG "\x02\x09"
+
+#define MBEDTLS_OID_DIGEST_ALG_SHA3_512         MBEDTLS_OID_NIST_ALG "\x02\x0a"
+
+
 #define MBEDTLS_OID_HMAC_SHA1                   MBEDTLS_OID_RSA_COMPANY "\x02\x07"
 
 #define MBEDTLS_OID_HMAC_SHA224                 MBEDTLS_OID_RSA_COMPANY "\x02\x08"
@@ -213,6 +226,16 @@
 #define MBEDTLS_OID_HMAC_SHA384                 MBEDTLS_OID_RSA_COMPANY "\x02\x0A"
 
 #define MBEDTLS_OID_HMAC_SHA512                 MBEDTLS_OID_RSA_COMPANY "\x02\x0B"
+
+#define MBEDTLS_OID_HMAC_SHA3_224               MBEDTLS_OID_NIST_ALG "\x02\x0d"
+
+#define MBEDTLS_OID_HMAC_SHA3_256               MBEDTLS_OID_NIST_ALG "\x02\x0e"
+
+#define MBEDTLS_OID_HMAC_SHA3_384               MBEDTLS_OID_NIST_ALG "\x02\x0f"
+
+#define MBEDTLS_OID_HMAC_SHA3_512               MBEDTLS_OID_NIST_ALG "\x02\x10"
+
+#define MBEDTLS_OID_HMAC_RIPEMD160              MBEDTLS_OID_INTERNET "\x05\x05\x08\x01\x04"
 
 #define MBEDTLS_OID_DES_CBC                     MBEDTLS_OID_ISO_IDENTIFIED_ORG \
         MBEDTLS_OID_OIW_SECSIG_ALG "\x07"
@@ -295,6 +318,11 @@
 
 #define MBEDTLS_OID_ECDSA_SHA512            MBEDTLS_OID_ANSI_X9_62_SIG_SHA2 "\x04"
 
+#define MBEDTLS_OID_X25519                  MBEDTLS_OID_THAWTE "\x6e"
+#define MBEDTLS_OID_X448                    MBEDTLS_OID_THAWTE "\x6f"
+#define MBEDTLS_OID_ED25519                 MBEDTLS_OID_THAWTE "\x70"
+#define MBEDTLS_OID_ED448                   MBEDTLS_OID_THAWTE "\x71"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -310,6 +338,8 @@ typedef struct mbedtls_oid_descriptor_t {
 
 int mbedtls_oid_get_numeric_string(char *buf, size_t size, const mbedtls_asn1_buf *oid);
 
+int mbedtls_oid_from_numeric_string(mbedtls_asn1_buf *oid, const char *oid_str, size_t size);
+
 int mbedtls_oid_get_x509_ext_type(const mbedtls_asn1_buf *oid, int *ext_type);
 
 int mbedtls_oid_get_attr_short_name(const mbedtls_asn1_buf *oid, const char **short_name);
@@ -319,13 +349,18 @@ int mbedtls_oid_get_pk_alg(const mbedtls_asn1_buf *oid, mbedtls_pk_type_t *pk_al
 int mbedtls_oid_get_oid_by_pk_alg(mbedtls_pk_type_t pk_alg,
                                   const char **oid, size_t *olen);
 
-#if defined(MBEDTLS_ECP_C)
+#if defined(MBEDTLS_PK_HAVE_ECC_KEYS)
 
 int mbedtls_oid_get_ec_grp(const mbedtls_asn1_buf *oid, mbedtls_ecp_group_id *grp_id);
 
 int mbedtls_oid_get_oid_by_ec_grp(mbedtls_ecp_group_id grp_id,
                                   const char **oid, size_t *olen);
-#endif /* MBEDTLS_ECP_C */
+
+int mbedtls_oid_get_ec_grp_algid(const mbedtls_asn1_buf *oid, mbedtls_ecp_group_id *grp_id);
+
+int mbedtls_oid_get_oid_by_ec_grp_algid(mbedtls_ecp_group_id grp_id,
+                                        const char **oid, size_t *olen);
+#endif /* MBEDTLS_PK_HAVE_ECC_KEYS */
 
 int mbedtls_oid_get_sig_alg(const mbedtls_asn1_buf *oid,
                             mbedtls_md_type_t *md_alg, mbedtls_pk_type_t *pk_alg);

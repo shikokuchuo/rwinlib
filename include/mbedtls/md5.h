@@ -36,18 +36,12 @@
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_MD5_ALT)
-
 typedef struct mbedtls_md5_context {
     uint32_t MBEDTLS_PRIVATE(total)[2];
     uint32_t MBEDTLS_PRIVATE(state)[4];
     unsigned char MBEDTLS_PRIVATE(buffer)[64];
 }
 mbedtls_md5_context;
-
-#else  /* MBEDTLS_MD5_ALT */
-#include "md5_alt.h"
-#endif /* MBEDTLS_MD5_ALT */
 
 void mbedtls_md5_init(mbedtls_md5_context *ctx);
 

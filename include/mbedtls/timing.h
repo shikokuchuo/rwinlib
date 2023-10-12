@@ -31,10 +31,8 @@
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_TIMING_ALT)
-
 struct mbedtls_timing_hr_time {
-    unsigned char MBEDTLS_PRIVATE(opaque)[32];
+    uint64_t MBEDTLS_PRIVATE(opaque)[4];
 };
 
 typedef struct mbedtls_timing_delay_context {
@@ -42,10 +40,6 @@ typedef struct mbedtls_timing_delay_context {
     uint32_t                        MBEDTLS_PRIVATE(int_ms);
     uint32_t                        MBEDTLS_PRIVATE(fin_ms);
 } mbedtls_timing_delay_context;
-
-#else  /* MBEDTLS_TIMING_ALT */
-#include "timing_alt.h"
-#endif /* MBEDTLS_TIMING_ALT */
 
 unsigned long mbedtls_timing_get_timer(struct mbedtls_timing_hr_time *val, int reset);
 

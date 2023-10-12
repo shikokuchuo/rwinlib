@@ -25,6 +25,7 @@
 #define MBEDTLS_PKCS5_H
 
 #include "mbedtls/build_info.h"
+#include "mbedtls/platform_util.h"
 
 #include "mbedtls/asn1.h"
 #include "mbedtls/md.h"
@@ -33,11 +34,8 @@
 #include <stdint.h>
 
 #define MBEDTLS_ERR_PKCS5_BAD_INPUT_DATA                  -0x2f80
-
 #define MBEDTLS_ERR_PKCS5_INVALID_FORMAT                  -0x2f00
-
 #define MBEDTLS_ERR_PKCS5_FEATURE_UNAVAILABLE             -0x2e80
-
 #define MBEDTLS_ERR_PKCS5_PASSWORD_MISMATCH               -0x2e00
 
 #define MBEDTLS_PKCS5_DECRYPT      0
@@ -49,10 +47,23 @@ extern "C" {
 
 #if defined(MBEDTLS_ASN1_PARSE_C)
 
-int mbedtls_pkcs5_pbes2(const mbedtls_asn1_buf *pbe_params, int mode,
-                        const unsigned char *pwd,  size_t pwdlen,
-                        const unsigned char *data, size_t datalen,
-                        unsigned char *output);
+#if !defined(MBEDTLS_DEPRECATED_REMOVED)
+
+int MBEDTLS_DEPRECATED mbedtls_pkcs5_pbes2(const mbedtls_asn1_buf *pbe_params, int mode,
+                                           const unsigned char *pwd,  size_t pwdlen,
+                                           const unsigned char *data, size_t datalen,
+                                           unsigned char *output);
+#endif /* MBEDTLS_DEPRECATED_REMOVED */
+
+#if defined(MBEDTLS_CIPHER_PADDING_PKCS7)
+
+int mbedtls_pkcs5_pbes2_ext(const mbedtls_asn1_buf *pbe_params, int mode,
+                            const unsigned char *pwd,  size_t pwdlen,
+                            const unsigned char *data, size_t datalen,
+                            unsigned char *output, size_t output_size,
+                            size_t *output_len);
+
+#endif /* MBEDTLS_CIPHER_PADDING_PKCS7 */
 
 #endif /* MBEDTLS_ASN1_PARSE_C */
 
@@ -75,7 +86,6 @@ int MBEDTLS_DEPRECATED mbedtls_pkcs5_pbkdf2_hmac(mbedtls_md_context_t *ctx,
                                                  unsigned char *output);
 #endif /* !MBEDTLS_DEPRECATED_REMOVED */
 #endif /* MBEDTLS_MD_C */
-
 
 #ifdef __cplusplus
 }

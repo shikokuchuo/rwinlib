@@ -30,10 +30,6 @@
 
 #include <stddef.h>
 
-#ifdef __DOXYGEN_ONLY__
-
-#endif /* __DOXYGEN_ONLY__ */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -76,7 +72,6 @@ static psa_key_usage_t psa_get_key_usage_flags(
 
 static void psa_set_key_algorithm(psa_key_attributes_t *attributes,
                                   psa_algorithm_t alg);
-
 
 static psa_algorithm_t psa_get_key_algorithm(
     const psa_key_attributes_t *attributes);
@@ -437,6 +432,9 @@ psa_status_t psa_key_derivation_verify_key(
     psa_key_derivation_operation_t *operation,
     psa_key_id_t expected);
 
+psa_status_t psa_key_derivation_abort(
+    psa_key_derivation_operation_t *operation);
+
 psa_status_t psa_raw_key_agreement(psa_algorithm_t alg,
                                    mbedtls_svc_key_id_t private_key,
                                    const uint8_t *peer_key,
@@ -483,7 +481,6 @@ psa_status_t psa_verify_hash_start(
     mbedtls_svc_key_id_t key, psa_algorithm_t alg,
     const uint8_t *hash, size_t hash_length,
     const uint8_t *signature, size_t signature_length);
-
 
 psa_status_t psa_verify_hash_complete(
     psa_verify_hash_interruptible_operation_t *operation);

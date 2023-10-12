@@ -19,6 +19,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+/*
+ * This set of run-time variables can be used to determine the version number of
+ * the Mbed TLS library used. Compile-time version defines for the same can be
+ * found in build_info.h
+ */
 #ifndef MBEDTLS_VERSION_H
 #define MBEDTLS_VERSION_H
 

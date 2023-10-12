@@ -36,48 +36,44 @@
 #endif
 
 #define MBEDTLS_ERR_HMAC_DRBG_REQUEST_TOO_BIG              -0x0003
-
 #define MBEDTLS_ERR_HMAC_DRBG_INPUT_TOO_BIG                -0x0005
-
 #define MBEDTLS_ERR_HMAC_DRBG_FILE_IO_ERROR                -0x0007
-
 #define MBEDTLS_ERR_HMAC_DRBG_ENTROPY_SOURCE_FAILED        -0x0009
 
 #if !defined(MBEDTLS_HMAC_DRBG_RESEED_INTERVAL)
-#define MBEDTLS_HMAC_DRBG_RESEED_INTERVAL   10000   /**< Interval before reseed is performed by default */
+#define MBEDTLS_HMAC_DRBG_RESEED_INTERVAL   10000
 #endif
 
 #if !defined(MBEDTLS_HMAC_DRBG_MAX_INPUT)
-#define MBEDTLS_HMAC_DRBG_MAX_INPUT         256     /**< Maximum number of additional input bytes */
+#define MBEDTLS_HMAC_DRBG_MAX_INPUT         256
 #endif
 
 #if !defined(MBEDTLS_HMAC_DRBG_MAX_REQUEST)
-#define MBEDTLS_HMAC_DRBG_MAX_REQUEST       1024    /**< Maximum number of requested bytes per call */
+#define MBEDTLS_HMAC_DRBG_MAX_REQUEST       1024
 #endif
 
 #if !defined(MBEDTLS_HMAC_DRBG_MAX_SEED_INPUT)
-#define MBEDTLS_HMAC_DRBG_MAX_SEED_INPUT    384     /**< Maximum size of (re)seed buffer */
+#define MBEDTLS_HMAC_DRBG_MAX_SEED_INPUT    384
 #endif
 
-#define MBEDTLS_HMAC_DRBG_PR_OFF   0   /**< No prediction resistance       */
-#define MBEDTLS_HMAC_DRBG_PR_ON    1   /**< Prediction resistance enabled  */
+#define MBEDTLS_HMAC_DRBG_PR_OFF   0
+#define MBEDTLS_HMAC_DRBG_PR_ON    1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct mbedtls_hmac_drbg_context {
-    mbedtls_md_context_t MBEDTLS_PRIVATE(md_ctx);                    /*!< HMAC context (inc. K)  */
-    unsigned char MBEDTLS_PRIVATE(V)[MBEDTLS_MD_MAX_SIZE];  /*!< V in the spec          */
-    int MBEDTLS_PRIVATE(reseed_counter);                     /*!< reseed counter         */
+    mbedtls_md_context_t MBEDTLS_PRIVATE(md_ctx);
+    unsigned char MBEDTLS_PRIVATE(V)[MBEDTLS_MD_MAX_SIZE];
+    int MBEDTLS_PRIVATE(reseed_counter);
 
-    size_t MBEDTLS_PRIVATE(entropy_len);         /*!< entropy bytes grabbed on each (re)seed */
-    int MBEDTLS_PRIVATE(prediction_resistance);  /*!< enable prediction resistance (Automatic
-                                                    reseed before every random generation) */
-    int MBEDTLS_PRIVATE(reseed_interval);        /*!< reseed interval   */
+    size_t MBEDTLS_PRIVATE(entropy_len);
+    int MBEDTLS_PRIVATE(prediction_resistance);
+    int MBEDTLS_PRIVATE(reseed_interval);
 
-    int(*MBEDTLS_PRIVATE(f_entropy))(void *, unsigned char *, size_t);  /*!< entropy function */
-    void *MBEDTLS_PRIVATE(p_entropy);            /*!< context for the entropy function        */
+    int(*MBEDTLS_PRIVATE(f_entropy))(void *, unsigned char *, size_t);
+    void *MBEDTLS_PRIVATE(p_entropy);
 
 #if defined(MBEDTLS_THREADING_C)
     mbedtls_threading_mutex_t MBEDTLS_PRIVATE(mutex);
@@ -86,12 +82,20 @@ typedef struct mbedtls_hmac_drbg_context {
 
 void mbedtls_hmac_drbg_init(mbedtls_hmac_drbg_context *ctx);
 
+#if defined(MBEDTLS_THREADING_C)
+
+#endif /* MBEDTLS_THREADING_C */
+
 int mbedtls_hmac_drbg_seed(mbedtls_hmac_drbg_context *ctx,
                            const mbedtls_md_info_t *md_info,
                            int (*f_entropy)(void *, unsigned char *, size_t),
                            void *p_entropy,
                            const unsigned char *custom,
                            size_t len);
+
+#if defined(MBEDTLS_THREADING_C)
+
+#endif /* MBEDTLS_THREADING_C */
 
 int mbedtls_hmac_drbg_seed_buf(mbedtls_hmac_drbg_context *ctx,
                                const mbedtls_md_info_t *md_info,

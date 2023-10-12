@@ -68,23 +68,14 @@
 #include "mbedtls/bignum.h"
 
 #define MBEDTLS_ERR_DHM_BAD_INPUT_DATA                    -0x3080
-
 #define MBEDTLS_ERR_DHM_READ_PARAMS_FAILED                -0x3100
-
 #define MBEDTLS_ERR_DHM_MAKE_PARAMS_FAILED                -0x3180
-
 #define MBEDTLS_ERR_DHM_READ_PUBLIC_FAILED                -0x3200
-
 #define MBEDTLS_ERR_DHM_MAKE_PUBLIC_FAILED                -0x3280
-
 #define MBEDTLS_ERR_DHM_CALC_SECRET_FAILED                -0x3300
-
 #define MBEDTLS_ERR_DHM_INVALID_FORMAT                    -0x3380
-
 #define MBEDTLS_ERR_DHM_ALLOC_FAILED                      -0x3400
-
 #define MBEDTLS_ERR_DHM_FILE_IO_ERROR                     -0x3480
-
 #define MBEDTLS_ERR_DHM_SET_GROUP_FAILED                  -0x3580
 
 typedef enum {
@@ -100,8 +91,6 @@ typedef enum {
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_DHM_ALT)
-
 typedef struct mbedtls_dhm_context {
     mbedtls_mpi MBEDTLS_PRIVATE(P);
     mbedtls_mpi MBEDTLS_PRIVATE(G);
@@ -115,10 +104,6 @@ typedef struct mbedtls_dhm_context {
     mbedtls_mpi MBEDTLS_PRIVATE(pX);
 }
 mbedtls_dhm_context;
-
-#else /* MBEDTLS_DHM_ALT */
-#include "dhm_alt.h"
-#endif /* MBEDTLS_DHM_ALT */
 
 void mbedtls_dhm_init(mbedtls_dhm_context *ctx);
 
@@ -169,11 +154,6 @@ int mbedtls_dhm_parse_dhmfile(mbedtls_dhm_context *dhm, const char *path);
 #endif /* MBEDTLS_FS_IO */
 #endif /* MBEDTLS_ASN1_PARSE_C */
 
-#if defined(MBEDTLS_SELF_TEST)
-
-int mbedtls_dhm_self_test(int verbose);
-
-#endif /* MBEDTLS_SELF_TEST */
 #ifdef __cplusplus
 }
 #endif

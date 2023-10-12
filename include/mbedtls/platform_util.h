@@ -76,10 +76,14 @@ MBEDTLS_DEPRECATED typedef int mbedtls_deprecated_numeric_constant_t;
 #define MBEDTLS_CHECK_RETURN_OPTIONAL
 
 #if !defined(MBEDTLS_IGNORE_RETURN)
+
 #define MBEDTLS_IGNORE_RETURN(result) ((void) !(result))
 #endif
 
+#if !defined(MBEDTLS_TEST_DEFINES_ZEROIZE)
+
 void mbedtls_platform_zeroize(void *buf, size_t len);
+#endif
 
 #if defined(MBEDTLS_HAVE_TIME_DATE)
 

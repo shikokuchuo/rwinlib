@@ -40,21 +40,13 @@
 #include "mbedtls/bignum.h"
 
 #define MBEDTLS_ERR_ECP_BAD_INPUT_DATA                    -0x4F80
-
 #define MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL                  -0x4F00
-
 #define MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE               -0x4E80
-
 #define MBEDTLS_ERR_ECP_VERIFY_FAILED                     -0x4E00
-
 #define MBEDTLS_ERR_ECP_ALLOC_FAILED                      -0x4D80
-
 #define MBEDTLS_ERR_ECP_RANDOM_FAILED                     -0x4D00
-
 #define MBEDTLS_ERR_ECP_INVALID_KEY                       -0x4C80
-
 #define MBEDTLS_ERR_ECP_SIG_LEN_MISMATCH                  -0x4C00
-
 #define MBEDTLS_ERR_ECP_IN_PROGRESS                       -0x4B00
 
 #if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED) || \
@@ -104,12 +96,6 @@ typedef enum {
     MBEDTLS_ECP_TYPE_MONTGOMERY,
 } mbedtls_ecp_curve_type;
 
-typedef enum {
-    MBEDTLS_ECP_MOD_NONE = 0,
-    MBEDTLS_ECP_MOD_COORDINATE,
-    MBEDTLS_ECP_MOD_SCALAR
-} mbedtls_ecp_modulus_type;
-
 typedef struct mbedtls_ecp_curve_info {
     mbedtls_ecp_group_id grp_id;
     uint16_t tls_id;
@@ -124,7 +110,6 @@ typedef struct mbedtls_ecp_point {
 }
 mbedtls_ecp_point;
 
-#if !defined(MBEDTLS_ECP_ALT)
 
 typedef struct mbedtls_ecp_group {
     mbedtls_ecp_group_id id;
@@ -156,11 +141,7 @@ mbedtls_ecp_group;
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM  1
 #endif /* MBEDTLS_ECP_FIXED_POINT_OPTIM */
 
-#else  /* MBEDTLS_ECP_ALT */
-#include "ecp_alt.h"
-#endif /* MBEDTLS_ECP_ALT */
-
-#if !defined(MBEDTLS_ECP_C)
+#if !defined(MBEDTLS_ECP_LIGHT)
 
 #define MBEDTLS_ECP_MAX_BITS 1
 #elif defined(MBEDTLS_ECP_DP_SECP521R1_ENABLED)
@@ -189,9 +170,9 @@ mbedtls_ecp_group;
 #define MBEDTLS_ECP_MAX_BITS 192
 #elif defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
 #define MBEDTLS_ECP_MAX_BITS 192
-#else
+#else /* !MBEDTLS_ECP_LIGHT */
 #error "Missing definition of MBEDTLS_ECP_MAX_BITS"
-#endif
+#endif /* !MBEDTLS_ECP_LIGHT */
 
 #define MBEDTLS_ECP_MAX_BYTES    ((MBEDTLS_ECP_MAX_BITS + 7) / 8)
 #define MBEDTLS_ECP_MAX_PT_LEN   (2 * MBEDTLS_ECP_MAX_BYTES + 1)
@@ -337,6 +318,11 @@ int mbedtls_ecp_mul_restartable(mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                                 mbedtls_ecp_restart_ctx *rs_ctx);
 
 #if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
+
+static inline int mbedtls_ecp_group_a_is_minus_3(const mbedtls_ecp_group *grp)
+{
+    return grp->A.MBEDTLS_PRIVATE(p) == NULL;
+}
 
 int mbedtls_ecp_muladd(mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                        const mbedtls_mpi *m, const mbedtls_ecp_point *P,

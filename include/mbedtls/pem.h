@@ -28,21 +28,13 @@
 #include <stddef.h>
 
 #define MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT          -0x1080
-
 #define MBEDTLS_ERR_PEM_INVALID_DATA                      -0x1100
-
 #define MBEDTLS_ERR_PEM_ALLOC_FAILED                      -0x1180
-
 #define MBEDTLS_ERR_PEM_INVALID_ENC_IV                    -0x1200
-
 #define MBEDTLS_ERR_PEM_UNKNOWN_ENC_ALG                   -0x1280
-
 #define MBEDTLS_ERR_PEM_PASSWORD_REQUIRED                 -0x1300
-
 #define MBEDTLS_ERR_PEM_PASSWORD_MISMATCH                 -0x1380
-
 #define MBEDTLS_ERR_PEM_FEATURE_UNAVAILABLE               -0x1400
-
 #define MBEDTLS_ERR_PEM_BAD_INPUT_DATA                    -0x1480
 
 #ifdef __cplusplus

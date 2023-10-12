@@ -33,17 +33,11 @@
 #endif
 
 #define MBEDTLS_ERR_ASN1_OUT_OF_DATA                      -0x0060
-
 #define MBEDTLS_ERR_ASN1_UNEXPECTED_TAG                   -0x0062
-
 #define MBEDTLS_ERR_ASN1_INVALID_LENGTH                   -0x0064
-
 #define MBEDTLS_ERR_ASN1_LENGTH_MISMATCH                  -0x0066
-
 #define MBEDTLS_ERR_ASN1_INVALID_DATA                     -0x0068
-
 #define MBEDTLS_ERR_ASN1_ALLOC_FAILED                     -0x006A
-
 #define MBEDTLS_ERR_ASN1_BUF_TOO_SMALL                    -0x006C
 
 #define MBEDTLS_ASN1_BOOLEAN                 0x01
@@ -67,15 +61,14 @@
 #define MBEDTLS_ASN1_CONSTRUCTED             0x20
 #define MBEDTLS_ASN1_CONTEXT_SPECIFIC        0x80
 
-#define MBEDTLS_ASN1_IS_STRING_TAG(tag)                                     \
-    ((tag) < 32u && (                                                      \
+#define MBEDTLS_ASN1_IS_STRING_TAG(tag)                                \
+    ((unsigned int) (tag) < 32u && (                                   \
          ((1u << (tag)) & ((1u << MBEDTLS_ASN1_BMP_STRING)       |     \
                            (1u << MBEDTLS_ASN1_UTF8_STRING)      |     \
                            (1u << MBEDTLS_ASN1_T61_STRING)       |     \
                            (1u << MBEDTLS_ASN1_IA5_STRING)       |     \
                            (1u << MBEDTLS_ASN1_UNIVERSAL_STRING) |     \
-                           (1u << MBEDTLS_ASN1_PRINTABLE_STRING) |     \
-                           (1u << MBEDTLS_ASN1_BIT_STRING))) != 0))
+                           (1u << MBEDTLS_ASN1_PRINTABLE_STRING))) != 0))
 
 #define MBEDTLS_ASN1_TAG_CLASS_MASK          0xC0
 #define MBEDTLS_ASN1_TAG_PC_MASK             0x20
@@ -96,7 +89,7 @@ extern "C" {
 #endif
 
 typedef struct mbedtls_asn1_buf {
-    int tag; 
+    int tag;
     size_t len;
     unsigned char *p;
 }
@@ -123,6 +116,8 @@ typedef struct mbedtls_asn1_named_data {
 }
 mbedtls_asn1_named_data;
 
+#if defined(MBEDTLS_ASN1_PARSE_C) || defined(MBEDTLS_X509_CREATE_C)
+
 int mbedtls_asn1_get_len(unsigned char **p,
                          const unsigned char *end,
                          size_t *len);
@@ -130,6 +125,9 @@ int mbedtls_asn1_get_len(unsigned char **p,
 int mbedtls_asn1_get_tag(unsigned char **p,
                          const unsigned char *end,
                          size_t *len, int tag);
+#endif /* MBEDTLS_ASN1_PARSE_C || MBEDTLS_X509_CREATE_C */
+
+#if defined(MBEDTLS_ASN1_PARSE_C)
 
 int mbedtls_asn1_get_bool(unsigned char **p,
                           const unsigned char *end,
@@ -196,5 +194,7 @@ void mbedtls_asn1_free_named_data_list_shallow(mbedtls_asn1_named_data *name);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* MBEDTLS_ASN1_PARSE_C */
 
 #endif /* asn1.h */

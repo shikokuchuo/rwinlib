@@ -88,6 +88,11 @@ int mbedtls_ssl_cache_remove(void *data,
 #if defined(MBEDTLS_HAVE_TIME)
 
 void mbedtls_ssl_cache_set_timeout(mbedtls_ssl_cache_context *cache, int timeout);
+
+static inline int mbedtls_ssl_cache_get_timeout(mbedtls_ssl_cache_context *cache)
+{
+    return cache->MBEDTLS_PRIVATE(timeout);
+}
 #endif /* MBEDTLS_HAVE_TIME */
 
 void mbedtls_ssl_cache_set_max_entries(mbedtls_ssl_cache_context *cache, int max);

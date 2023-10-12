@@ -39,7 +39,6 @@
 
 #include "crypto_types.h"
 #include "crypto_values.h"
-
 #include <psa/crypto_sizes.h>
 
 typedef enum {

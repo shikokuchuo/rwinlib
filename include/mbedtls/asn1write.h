@@ -48,11 +48,16 @@
 extern "C" {
 #endif
 
+#if defined(MBEDTLS_ASN1_WRITE_C) || defined(MBEDTLS_X509_USE_C)
+
 int mbedtls_asn1_write_len(unsigned char **p, const unsigned char *start,
                            size_t len);
 
 int mbedtls_asn1_write_tag(unsigned char **p, const unsigned char *start,
                            unsigned char tag);
+#endif /* MBEDTLS_ASN1_WRITE_C || MBEDTLS_X509_USE_C */
+
+#if defined(MBEDTLS_ASN1_WRITE_C)
 
 int mbedtls_asn1_write_raw_buffer(unsigned char **p, const unsigned char *start,
                                   const unsigned char *buf, size_t size);
@@ -72,6 +77,11 @@ int mbedtls_asn1_write_algorithm_identifier(unsigned char **p,
                                             const unsigned char *start,
                                             const char *oid, size_t oid_len,
                                             size_t par_len);
+
+int mbedtls_asn1_write_algorithm_identifier_ext(unsigned char **p,
+                                                const unsigned char *start,
+                                                const char *oid, size_t oid_len,
+                                                size_t par_len, int has_par);
 
 int mbedtls_asn1_write_bool(unsigned char **p, const unsigned char *start,
                             int boolean);
@@ -113,5 +123,7 @@ mbedtls_asn1_named_data *mbedtls_asn1_store_named_data(mbedtls_asn1_named_data *
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* MBEDTLS_ASN1_WRITE_C */
 
 #endif /* MBEDTLS_ASN1_WRITE_H */

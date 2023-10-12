@@ -5,6 +5,7 @@
  *
  * The Cipher-based Message Authentication Code (CMAC) Mode for
  * Authentication is defined in <em>RFC-4493: The AES-CMAC Algorithm</em>.
+ * It is supported with AES and DES.
  */
 /*
  *  Copyright The Mbed TLS Contributors
@@ -39,22 +40,21 @@ extern "C" {
 #define MBEDTLS_DES3_BLOCK_SIZE         8
 
 #if defined(MBEDTLS_AES_C)
-#define MBEDTLS_CIPHER_BLKSIZE_MAX      16
+#define MBEDTLS_CMAC_MAX_BLOCK_SIZE      16
 #else
-#define MBEDTLS_CIPHER_BLKSIZE_MAX      8
+#define MBEDTLS_CMAC_MAX_BLOCK_SIZE      8
 #endif
 
-#if !defined(MBEDTLS_CMAC_ALT)
+#if !defined(MBEDTLS_DEPRECATED_REMOVED)
+
+#define MBEDTLS_CIPHER_BLKSIZE_MAX MBEDTLS_MAX_BLOCK_LENGTH
+#endif /* MBEDTLS_DEPRECATED_REMOVED */
 
 struct mbedtls_cmac_context_t {
-    unsigned char       MBEDTLS_PRIVATE(state)[MBEDTLS_CIPHER_BLKSIZE_MAX];
-    unsigned char       MBEDTLS_PRIVATE(unprocessed_block)[MBEDTLS_CIPHER_BLKSIZE_MAX];
+    unsigned char       MBEDTLS_PRIVATE(state)[MBEDTLS_CMAC_MAX_BLOCK_SIZE];
+    unsigned char       MBEDTLS_PRIVATE(unprocessed_block)[MBEDTLS_CMAC_MAX_BLOCK_SIZE];
     size_t              MBEDTLS_PRIVATE(unprocessed_len);
 };
-
-#else  /* !MBEDTLS_CMAC_ALT */
-#include "cmac_alt.h"
-#endif /* !MBEDTLS_CMAC_ALT */
 
 int mbedtls_cipher_cmac_starts(mbedtls_cipher_context_t *ctx,
                                const unsigned char *key, size_t keybits);

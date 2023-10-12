@@ -39,21 +39,13 @@
 #endif
 
 #define MBEDTLS_ERR_RSA_BAD_INPUT_DATA                    -0x4080
-
 #define MBEDTLS_ERR_RSA_INVALID_PADDING                   -0x4100
-
 #define MBEDTLS_ERR_RSA_KEY_GEN_FAILED                    -0x4180
-
 #define MBEDTLS_ERR_RSA_KEY_CHECK_FAILED                  -0x4200
-
 #define MBEDTLS_ERR_RSA_PUBLIC_FAILED                     -0x4280
-
 #define MBEDTLS_ERR_RSA_PRIVATE_FAILED                    -0x4300
-
 #define MBEDTLS_ERR_RSA_VERIFY_FAILED                     -0x4380
-
 #define MBEDTLS_ERR_RSA_OUTPUT_TOO_LARGE                  -0x4400
-
 #define MBEDTLS_ERR_RSA_RNG_FAILED                        -0x4480
 
 #define MBEDTLS_RSA_PKCS_V15    0
@@ -68,7 +60,11 @@
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_RSA_ALT)
+#if !defined(MBEDTLS_RSA_GEN_KEY_MIN_BITS)
+#define MBEDTLS_RSA_GEN_KEY_MIN_BITS 1024
+#elif MBEDTLS_RSA_GEN_KEY_MIN_BITS < 128
+#error "MBEDTLS_RSA_GEN_KEY_MIN_BITS must be at least 128 bits"
+#endif
 
 typedef struct mbedtls_rsa_context {
     int MBEDTLS_PRIVATE(ver);
@@ -100,10 +96,6 @@ typedef struct mbedtls_rsa_context {
 #endif
 }
 mbedtls_rsa_context;
-
-#else  /* MBEDTLS_RSA_ALT */
-#include "rsa_alt.h"
-#endif /* MBEDTLS_RSA_ALT */
 
 void mbedtls_rsa_init(mbedtls_rsa_context *ctx);
 

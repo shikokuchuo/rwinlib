@@ -36,8 +36,6 @@
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_SHA512_ALT)
-
 typedef struct mbedtls_sha512_context {
     uint64_t MBEDTLS_PRIVATE(total)[2];
     uint64_t MBEDTLS_PRIVATE(state)[8];
@@ -47,10 +45,6 @@ typedef struct mbedtls_sha512_context {
 #endif
 }
 mbedtls_sha512_context;
-
-#else  /* MBEDTLS_SHA512_ALT */
-#include "sha512_alt.h"
-#endif /* MBEDTLS_SHA512_ALT */
 
 void mbedtls_sha512_init(mbedtls_sha512_context *ctx);
 

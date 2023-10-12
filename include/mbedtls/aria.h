@@ -52,17 +52,11 @@
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_ARIA_ALT)
-
 typedef struct mbedtls_aria_context {
     unsigned char MBEDTLS_PRIVATE(nr);
     uint32_t MBEDTLS_PRIVATE(rk)[MBEDTLS_ARIA_MAX_ROUNDS + 1][MBEDTLS_ARIA_BLOCKSIZE / 4];
 }
 mbedtls_aria_context;
-
-#else  /* MBEDTLS_ARIA_ALT */
-#include "aria_alt.h"
-#endif /* MBEDTLS_ARIA_ALT */
 
 void mbedtls_aria_init(mbedtls_aria_context *ctx);
 

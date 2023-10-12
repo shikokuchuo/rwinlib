@@ -58,32 +58,25 @@
 #define MBEDTLS_CCM_STAR_ENCRYPT  3
 
 #define MBEDTLS_ERR_CCM_BAD_INPUT       -0x000D
-
 #define MBEDTLS_ERR_CCM_AUTH_FAILED     -0x000F
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_CCM_ALT)
-
 typedef struct mbedtls_ccm_context {
     unsigned char MBEDTLS_PRIVATE(y)[16];
     unsigned char MBEDTLS_PRIVATE(ctr)[16];
-    mbedtls_cipher_context_t MBEDTLS_PRIVATE(cipher_ctx);
     size_t MBEDTLS_PRIVATE(plaintext_len);
     size_t MBEDTLS_PRIVATE(add_len);
     size_t MBEDTLS_PRIVATE(tag_len);
     size_t MBEDTLS_PRIVATE(processed);
-    unsigned char MBEDTLS_PRIVATE(q);
-    unsigned char MBEDTLS_PRIVATE(mode);
+    unsigned int MBEDTLS_PRIVATE(q);
+    unsigned int MBEDTLS_PRIVATE(mode);
+    mbedtls_cipher_context_t MBEDTLS_PRIVATE(cipher_ctx);
     int MBEDTLS_PRIVATE(state);
 }
 mbedtls_ccm_context;
-
-#else  /* MBEDTLS_CCM_ALT */
-#include "ccm_alt.h"
-#endif /* MBEDTLS_CCM_ALT */
 
 void mbedtls_ccm_init(mbedtls_ccm_context *ctx);
 

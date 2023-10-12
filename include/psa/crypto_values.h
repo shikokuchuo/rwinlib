@@ -578,8 +578,14 @@
 
 #define PSA_ALG_IS_PBKDF2_HMAC(alg)                                    \
     (((alg) & ~PSA_ALG_HASH_MASK) == PSA_ALG_PBKDF2_HMAC_BASE)
+#define PSA_ALG_PBKDF2_HMAC_GET_HASH(pbkdf2_alg)                         \
+    (PSA_ALG_CATEGORY_HASH | ((pbkdf2_alg) & PSA_ALG_HASH_MASK))
 
 #define PSA_ALG_PBKDF2_AES_CMAC_PRF_128         ((psa_algorithm_t) 0x08800200)
+
+#define PSA_ALG_IS_PBKDF2(kdf_alg)                                      \
+    (PSA_ALG_IS_PBKDF2_HMAC(kdf_alg) || \
+     ((kdf_alg) == PSA_ALG_PBKDF2_AES_CMAC_PRF_128))
 
 #define PSA_ALG_KEY_DERIVATION_MASK             ((psa_algorithm_t) 0xfe00ffff)
 #define PSA_ALG_KEY_AGREEMENT_MASK              ((psa_algorithm_t) 0xffff0000)
@@ -662,6 +668,7 @@
 #define PSA_KEY_ID_VENDOR_MIN                   ((psa_key_id_t) 0x40000000)
 
 #define PSA_KEY_ID_VENDOR_MAX                   ((psa_key_id_t) 0x7fffffff)
+
 
 #if !defined(MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER)
 

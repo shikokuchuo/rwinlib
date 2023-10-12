@@ -47,17 +47,11 @@
 #endif
 
 #define MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE  -0x6080
-
 #define MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA       -0x6100
-
 #define MBEDTLS_ERR_CIPHER_ALLOC_FAILED         -0x6180
-
 #define MBEDTLS_ERR_CIPHER_INVALID_PADDING      -0x6200
-
 #define MBEDTLS_ERR_CIPHER_FULL_BLOCK_EXPECTED  -0x6280
-
 #define MBEDTLS_ERR_CIPHER_AUTH_FAILED          -0x6300
-
 #define MBEDTLS_ERR_CIPHER_INVALID_CONTEXT      -0x6380
 
 #define MBEDTLS_CIPHER_VARIABLE_IV_LEN     0x01
@@ -218,23 +212,38 @@ typedef struct mbedtls_cipher_base_t mbedtls_cipher_base_t;
 typedef struct mbedtls_cmac_context_t mbedtls_cmac_context_t;
 
 typedef struct mbedtls_cipher_info_t {
-    mbedtls_cipher_type_t MBEDTLS_PRIVATE(type);
-    mbedtls_cipher_mode_t MBEDTLS_PRIVATE(mode);
-    unsigned int MBEDTLS_PRIVATE(key_bitlen);
+
     const char *MBEDTLS_PRIVATE(name);
-    unsigned int MBEDTLS_PRIVATE(iv_size);
-    int MBEDTLS_PRIVATE(flags);
-    unsigned int MBEDTLS_PRIVATE(block_size);
-    const mbedtls_cipher_base_t *MBEDTLS_PRIVATE(base);
+
+    unsigned int MBEDTLS_PRIVATE(block_size) : 5;
+
+    unsigned int MBEDTLS_PRIVATE(iv_size) : 3;
+
+    unsigned int MBEDTLS_PRIVATE(key_bitlen) : 4;
+
+    unsigned int MBEDTLS_PRIVATE(mode) : 4;
+
+    unsigned int MBEDTLS_PRIVATE(type) : 8;
+
+    unsigned int MBEDTLS_PRIVATE(flags) : 2;
+
+    unsigned int MBEDTLS_PRIVATE(base_idx) : 5;
 
 } mbedtls_cipher_info_t;
 
+#define MBEDTLS_KEY_BITLEN_SHIFT  6
+#define MBEDTLS_IV_SIZE_SHIFT     2
+
 typedef struct mbedtls_cipher_context_t {
+
     const mbedtls_cipher_info_t *MBEDTLS_PRIVATE(cipher_info);
+
     int MBEDTLS_PRIVATE(key_bitlen);
+
     mbedtls_operation_t MBEDTLS_PRIVATE(operation);
 
 #if defined(MBEDTLS_CIPHER_MODE_WITH_PADDING)
+
     void(*MBEDTLS_PRIVATE(add_padding))(unsigned char *output, size_t olen, size_t data_len);
     int(*MBEDTLS_PRIVATE(get_padding))(unsigned char *input, size_t ilen, size_t *data_len);
 #endif
@@ -253,9 +262,9 @@ typedef struct mbedtls_cipher_context_t {
     mbedtls_cmac_context_t *MBEDTLS_PRIVATE(cmac_ctx);
 #endif
 
-#if defined(MBEDTLS_USE_PSA_CRYPTO)
+#if defined(MBEDTLS_USE_PSA_CRYPTO) && !defined(MBEDTLS_DEPRECATED_REMOVED)
     unsigned char MBEDTLS_PRIVATE(psa_enabled);
-#endif /* MBEDTLS_USE_PSA_CRYPTO */
+#endif /* MBEDTLS_USE_PSA_CRYPTO && !MBEDTLS_DEPRECATED_REMOVED */
 
 } mbedtls_cipher_context_t;
 
@@ -275,7 +284,7 @@ static inline mbedtls_cipher_type_t mbedtls_cipher_info_get_type(
     if (info == NULL) {
         return MBEDTLS_CIPHER_NONE;
     } else {
-        return info->MBEDTLS_PRIVATE(type);
+        return (mbedtls_cipher_type_t) info->MBEDTLS_PRIVATE(type);
     }
 }
 
@@ -285,7 +294,7 @@ static inline mbedtls_cipher_mode_t mbedtls_cipher_info_get_mode(
     if (info == NULL) {
         return MBEDTLS_MODE_NONE;
     } else {
-        return info->MBEDTLS_PRIVATE(mode);
+        return (mbedtls_cipher_mode_t) info->MBEDTLS_PRIVATE(mode);
     }
 }
 
@@ -295,7 +304,7 @@ static inline size_t mbedtls_cipher_info_get_key_bitlen(
     if (info == NULL) {
         return 0;
     } else {
-        return info->MBEDTLS_PRIVATE(key_bitlen);
+        return info->MBEDTLS_PRIVATE(key_bitlen) << MBEDTLS_KEY_BITLEN_SHIFT;
     }
 }
 
@@ -316,7 +325,7 @@ static inline size_t mbedtls_cipher_info_get_iv_size(
         return 0;
     }
 
-    return (size_t) info->MBEDTLS_PRIVATE(iv_size);
+    return ((size_t) info->MBEDTLS_PRIVATE(iv_size)) << MBEDTLS_IV_SIZE_SHIFT;
 }
 
 static inline size_t mbedtls_cipher_info_get_block_size(
@@ -326,7 +335,7 @@ static inline size_t mbedtls_cipher_info_get_block_size(
         return 0;
     }
 
-    return (size_t) info->MBEDTLS_PRIVATE(block_size);
+    return (size_t) (info->MBEDTLS_PRIVATE(block_size));
 }
 
 static inline int mbedtls_cipher_info_has_variable_key_bitlen(
@@ -373,7 +382,7 @@ static inline unsigned int mbedtls_cipher_get_block_size(
         return 0;
     }
 
-    return ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(block_size);
+    return (unsigned int) ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(block_size);
 }
 
 static inline mbedtls_cipher_mode_t mbedtls_cipher_get_cipher_mode(
@@ -384,7 +393,7 @@ static inline mbedtls_cipher_mode_t mbedtls_cipher_get_cipher_mode(
         return MBEDTLS_MODE_NONE;
     }
 
-    return ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(mode);
+    return (mbedtls_cipher_mode_t) ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(mode);
 }
 
 static inline int mbedtls_cipher_get_iv_size(
@@ -399,7 +408,8 @@ static inline int mbedtls_cipher_get_iv_size(
         return (int) ctx->MBEDTLS_PRIVATE(iv_size);
     }
 
-    return (int) ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(iv_size);
+    return (int) (((int) ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(iv_size)) <<
+                  MBEDTLS_IV_SIZE_SHIFT);
 }
 
 static inline mbedtls_cipher_type_t mbedtls_cipher_get_type(
@@ -411,7 +421,7 @@ static inline mbedtls_cipher_type_t mbedtls_cipher_get_type(
         return MBEDTLS_CIPHER_NONE;
     }
 
-    return ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(type);
+    return (mbedtls_cipher_type_t) ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(type);
 }
 
 static inline const char *mbedtls_cipher_get_name(
@@ -434,7 +444,8 @@ static inline int mbedtls_cipher_get_key_bitlen(
         return MBEDTLS_KEY_LENGTH_NONE;
     }
 
-    return (int) ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(key_bitlen);
+    return (int) ctx->MBEDTLS_PRIVATE(cipher_info)->MBEDTLS_PRIVATE(key_bitlen) <<
+           MBEDTLS_KEY_BITLEN_SHIFT;
 }
 
 static inline mbedtls_operation_t mbedtls_cipher_get_operation(

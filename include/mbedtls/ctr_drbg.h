@@ -45,17 +45,15 @@
 #include "mbedtls/build_info.h"
 
 #include "mbedtls/aes.h"
+#include "entropy.h"
 
 #if defined(MBEDTLS_THREADING_C)
 #include "mbedtls/threading.h"
 #endif
 
 #define MBEDTLS_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED        -0x0034
-
 #define MBEDTLS_ERR_CTR_DRBG_REQUEST_TOO_BIG              -0x0036
-
 #define MBEDTLS_ERR_CTR_DRBG_INPUT_TOO_BIG                -0x0038
-
 #define MBEDTLS_ERR_CTR_DRBG_FILE_IO_ERROR                -0x003A
 
 #define MBEDTLS_CTR_DRBG_BLOCKSIZE          16
@@ -68,21 +66,21 @@
 
 #endif
 
-#define MBEDTLS_CTR_DRBG_KEYBITS            (MBEDTLS_CTR_DRBG_KEYSIZE * 8)
-#define MBEDTLS_CTR_DRBG_SEEDLEN            (MBEDTLS_CTR_DRBG_KEYSIZE + MBEDTLS_CTR_DRBG_BLOCKSIZE)
+#define MBEDTLS_CTR_DRBG_KEYBITS            (MBEDTLS_CTR_DRBG_KEYSIZE * 8)   /**< The key size for the DRBG operation, in bits. */
+#define MBEDTLS_CTR_DRBG_SEEDLEN            (MBEDTLS_CTR_DRBG_KEYSIZE + MBEDTLS_CTR_DRBG_BLOCKSIZE)   /**< The seed length, calculated as (counter + AES key). */
 
 #if !defined(MBEDTLS_CTR_DRBG_ENTROPY_LEN)
-#if defined(MBEDTLS_SHA512_C) && !defined(MBEDTLS_ENTROPY_FORCE_SHA256)
+#if defined(MBEDTLS_ENTROPY_SHA512_ACCUMULATOR)
 
 #define MBEDTLS_CTR_DRBG_ENTROPY_LEN        48
 
-#else /* defined(MBEDTLS_SHA512_C) && !defined(MBEDTLS_ENTROPY_FORCE_SHA256) */
+#else /* MBEDTLS_ENTROPY_SHA512_ACCUMULATOR */
 
 #if !defined(MBEDTLS_CTR_DRBG_USE_128_BIT_KEY)
 
 #endif /* !defined(MBEDTLS_CTR_DRBG_USE_128_BIT_KEY) */
 #define MBEDTLS_CTR_DRBG_ENTROPY_LEN        32
-#endif /* defined(MBEDTLS_SHA512_C) && !defined(MBEDTLS_ENTROPY_FORCE_SHA256) */
+#endif /* MBEDTLS_ENTROPY_SHA512_ACCUMULATOR */
 #endif /* !defined(MBEDTLS_CTR_DRBG_ENTROPY_LEN) */
 
 #if !defined(MBEDTLS_CTR_DRBG_RESEED_INTERVAL)
@@ -125,7 +123,6 @@ typedef struct mbedtls_ctr_drbg_context {
     mbedtls_aes_context MBEDTLS_PRIVATE(aes_ctx);
     int(*MBEDTLS_PRIVATE(f_entropy))(void *, unsigned char *, size_t);
     void *MBEDTLS_PRIVATE(p_entropy);
-
 #if defined(MBEDTLS_THREADING_C)
     mbedtls_threading_mutex_t MBEDTLS_PRIVATE(mutex);
 #endif
@@ -133,6 +130,15 @@ typedef struct mbedtls_ctr_drbg_context {
 mbedtls_ctr_drbg_context;
 
 void mbedtls_ctr_drbg_init(mbedtls_ctr_drbg_context *ctx);
+
+#if MBEDTLS_CTR_DRBG_ENTROPY_NONCE_LEN == 0
+
+#else
+
+#endif
+#if defined(MBEDTLS_THREADING_C)
+
+#endif /* MBEDTLS_THREADING_C */
 
 int mbedtls_ctr_drbg_seed(mbedtls_ctr_drbg_context *ctx,
                           int (*f_entropy)(void *, unsigned char *, size_t),

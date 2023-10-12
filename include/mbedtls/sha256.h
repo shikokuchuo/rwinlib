@@ -37,19 +37,14 @@
 extern "C" {
 #endif
 
-#if !defined(MBEDTLS_SHA256_ALT)
 
 typedef struct mbedtls_sha256_context {
+    unsigned char MBEDTLS_PRIVATE(buffer)[64];
     uint32_t MBEDTLS_PRIVATE(total)[2];
     uint32_t MBEDTLS_PRIVATE(state)[8];
-    unsigned char MBEDTLS_PRIVATE(buffer)[64];
     int MBEDTLS_PRIVATE(is224);
 }
 mbedtls_sha256_context;
-
-#else  /* MBEDTLS_SHA256_ALT */
-#include "sha256_alt.h"
-#endif /* MBEDTLS_SHA256_ALT */
 
 void mbedtls_sha256_init(mbedtls_sha256_context *ctx);
 

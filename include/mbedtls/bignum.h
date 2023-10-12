@@ -33,19 +33,12 @@
 #endif
 
 #define MBEDTLS_ERR_MPI_FILE_IO_ERROR                     -0x0002
-
 #define MBEDTLS_ERR_MPI_BAD_INPUT_DATA                    -0x0004
-
 #define MBEDTLS_ERR_MPI_INVALID_CHARACTER                 -0x0006
-
 #define MBEDTLS_ERR_MPI_BUFFER_TOO_SMALL                  -0x0008
-
 #define MBEDTLS_ERR_MPI_NEGATIVE_VALUE                    -0x000A
-
 #define MBEDTLS_ERR_MPI_DIVISION_BY_ZERO                  -0x000C
-
 #define MBEDTLS_ERR_MPI_NOT_ACCEPTABLE                    -0x000E
-
 #define MBEDTLS_ERR_MPI_ALLOC_FAILED                      -0x0010
 
 #define MBEDTLS_MPI_CHK(f)       \
@@ -77,12 +70,12 @@
 
 #if !defined(MBEDTLS_HAVE_INT32)
     #if defined(_MSC_VER) && defined(_M_AMD64)
-
         #if !defined(MBEDTLS_HAVE_INT64)
             #define MBEDTLS_HAVE_INT64
         #endif /* !MBEDTLS_HAVE_INT64 */
 typedef  int64_t mbedtls_mpi_sint;
 typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
     #elif defined(__GNUC__) && (                         \
     defined(__amd64__) || defined(__x86_64__)     || \
     defined(__ppc64__) || defined(__powerpc64__)  || \
@@ -95,8 +88,8 @@ typedef uint64_t mbedtls_mpi_uint;
         #endif /* MBEDTLS_HAVE_INT64 */
 typedef  int64_t mbedtls_mpi_sint;
 typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
         #if !defined(MBEDTLS_NO_UDBL_DIVISION)
-
 typedef unsigned int mbedtls_t_udbl __attribute__((mode(TI)));
             #define MBEDTLS_HAVE_UDBL
         #endif /* !MBEDTLS_NO_UDBL_DIVISION */
@@ -107,39 +100,47 @@ typedef unsigned int mbedtls_t_udbl __attribute__((mode(TI)));
         #endif /* !MBEDTLS_HAVE_INT64 */
 typedef  int64_t mbedtls_mpi_sint;
 typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
         #if !defined(MBEDTLS_NO_UDBL_DIVISION)
-
 typedef __uint128_t mbedtls_t_udbl;
             #define MBEDTLS_HAVE_UDBL
         #endif /* !MBEDTLS_NO_UDBL_DIVISION */
     #elif defined(MBEDTLS_HAVE_INT64)
-
 typedef  int64_t mbedtls_mpi_sint;
 typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
     #endif
 #endif /* !MBEDTLS_HAVE_INT32 */
 
 #if !defined(MBEDTLS_HAVE_INT64)
-
     #if !defined(MBEDTLS_HAVE_INT32)
         #define MBEDTLS_HAVE_INT32
     #endif /* !MBEDTLS_HAVE_INT32 */
 typedef  int32_t mbedtls_mpi_sint;
 typedef uint32_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT32_MAX
     #if !defined(MBEDTLS_NO_UDBL_DIVISION)
 typedef uint64_t mbedtls_t_udbl;
         #define MBEDTLS_HAVE_UDBL
     #endif /* !MBEDTLS_NO_UDBL_DIVISION */
 #endif /* !MBEDTLS_HAVE_INT64 */
 
+#if (!(defined(MBEDTLS_HAVE_INT32) || defined(MBEDTLS_HAVE_INT64))) || \
+    (defined(MBEDTLS_HAVE_INT32) && defined(MBEDTLS_HAVE_INT64))
+#error "Only 32-bit or 64-bit limbs are supported in bignum"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct mbedtls_mpi {
-    int MBEDTLS_PRIVATE(s);
-    size_t MBEDTLS_PRIVATE(n);
     mbedtls_mpi_uint *MBEDTLS_PRIVATE(p);
+    signed short MBEDTLS_PRIVATE(s);
+    unsigned short MBEDTLS_PRIVATE(n);
+#if MBEDTLS_MPI_MAX_LIMBS > 65535
+#error "MBEDTLS_MPI_MAX_LIMBS > 65535 is not supported"
+#endif
 }
 mbedtls_mpi;
 

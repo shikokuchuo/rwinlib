@@ -40,38 +40,24 @@
 #include "mbedtls/ecdsa.h"
 #endif
 
-#if defined(MBEDTLS_USE_PSA_CRYPTO)
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_PSA_CRYPTO_C)
 #include "psa/crypto.h"
 #endif
 
 #define MBEDTLS_ERR_PK_ALLOC_FAILED        -0x3F80
-
 #define MBEDTLS_ERR_PK_TYPE_MISMATCH       -0x3F00
-
 #define MBEDTLS_ERR_PK_BAD_INPUT_DATA      -0x3E80
-
 #define MBEDTLS_ERR_PK_FILE_IO_ERROR       -0x3E00
-
 #define MBEDTLS_ERR_PK_KEY_INVALID_VERSION -0x3D80
-
 #define MBEDTLS_ERR_PK_KEY_INVALID_FORMAT  -0x3D00
-
 #define MBEDTLS_ERR_PK_UNKNOWN_PK_ALG      -0x3C80
-
 #define MBEDTLS_ERR_PK_PASSWORD_REQUIRED   -0x3C00
-
 #define MBEDTLS_ERR_PK_PASSWORD_MISMATCH   -0x3B80
-
 #define MBEDTLS_ERR_PK_INVALID_PUBKEY      -0x3B00
-
 #define MBEDTLS_ERR_PK_INVALID_ALG         -0x3A80
-
 #define MBEDTLS_ERR_PK_UNKNOWN_NAMED_CURVE -0x3A00
-
 #define MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE -0x3980
-
 #define MBEDTLS_ERR_PK_SIG_LEN_MISMATCH    -0x3900
-
 #define MBEDTLS_ERR_PK_BUFFER_TOO_SMALL    -0x3880
 
 #ifdef __cplusplus
@@ -90,67 +76,50 @@ typedef enum {
 } mbedtls_pk_type_t;
 
 typedef struct mbedtls_pk_rsassa_pss_options {
-
     mbedtls_md_type_t mgf1_hash_id;
-
     int expected_salt_len;
-
 } mbedtls_pk_rsassa_pss_options;
 
 #define MBEDTLS_PK_SIGNATURE_MAX_SIZE 0
 
 #if (defined(MBEDTLS_RSA_C) || defined(MBEDTLS_PK_RSA_ALT_SUPPORT)) && \
     MBEDTLS_MPI_MAX_SIZE > MBEDTLS_PK_SIGNATURE_MAX_SIZE
-
 #undef MBEDTLS_PK_SIGNATURE_MAX_SIZE
 #define MBEDTLS_PK_SIGNATURE_MAX_SIZE MBEDTLS_MPI_MAX_SIZE
 #endif
 
 #if defined(MBEDTLS_ECDSA_C) &&                                 \
     MBEDTLS_ECDSA_MAX_LEN > MBEDTLS_PK_SIGNATURE_MAX_SIZE
-
 #undef MBEDTLS_PK_SIGNATURE_MAX_SIZE
 #define MBEDTLS_PK_SIGNATURE_MAX_SIZE MBEDTLS_ECDSA_MAX_LEN
 #endif
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
 #if PSA_SIGNATURE_MAX_SIZE > MBEDTLS_PK_SIGNATURE_MAX_SIZE
-
 #undef MBEDTLS_PK_SIGNATURE_MAX_SIZE
 #define MBEDTLS_PK_SIGNATURE_MAX_SIZE PSA_SIGNATURE_MAX_SIZE
 #endif
 
 #if PSA_VENDOR_ECDSA_SIGNATURE_MAX_SIZE + 11 > MBEDTLS_PK_SIGNATURE_MAX_SIZE
-
 #undef MBEDTLS_PK_SIGNATURE_MAX_SIZE
 #define MBEDTLS_PK_SIGNATURE_MAX_SIZE (PSA_VENDOR_ECDSA_SIGNATURE_MAX_SIZE + 11)
 #endif
 #endif /* defined(MBEDTLS_USE_PSA_CRYPTO) */
 
-#if !defined(MBEDTLS_USE_PSA_CRYPTO)
-#if defined(MBEDTLS_ECDSA_C)
-#define MBEDTLS_PK_CAN_ECDSA_SIGN
-#define MBEDTLS_PK_CAN_ECDSA_VERIFY
+#if defined(MBEDTLS_USE_PSA_CRYPTO) && defined(PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY) && \
+    !defined(MBEDTLS_ECP_C)
+#define MBEDTLS_PK_USE_PSA_EC_DATA
 #endif
-#else /* MBEDTLS_USE_PSA_CRYPTO */
-#if defined(PSA_WANT_ALG_ECDSA)
-#if defined(PSA_WANT_KEY_TYPE_ECC_KEY_PAIR)
-#define MBEDTLS_PK_CAN_ECDSA_SIGN
-#endif
-#if defined(PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY)
-#define MBEDTLS_PK_CAN_ECDSA_VERIFY
-#endif
-#endif /* PSA_WANT_ALG_ECDSA */
-#endif /* MBEDTLS_USE_PSA_CRYPTO */
 
-#if defined(MBEDTLS_PK_CAN_ECDSA_VERIFY) || defined(MBEDTLS_PK_CAN_ECDSA_SIGN)
-#define MBEDTLS_PK_CAN_ECDSA_SOME
-#endif
+#if defined(MBEDTLS_PK_USE_PSA_EC_DATA) || defined(MBEDTLS_ECP_C)
+#define MBEDTLS_PK_HAVE_ECC_KEYS
+#endif /* MBEDTLS_PK_USE_PSA_EC_DATA || MBEDTLS_ECP_C */
 
 typedef enum {
     MBEDTLS_PK_DEBUG_NONE = 0,
     MBEDTLS_PK_DEBUG_MPI,
     MBEDTLS_PK_DEBUG_ECP,
+    MBEDTLS_PK_DEBUG_PSA_EC,
 } mbedtls_pk_debug_type;
 
 typedef struct mbedtls_pk_debug_item {
@@ -163,9 +132,23 @@ typedef struct mbedtls_pk_debug_item {
 
 typedef struct mbedtls_pk_info_t mbedtls_pk_info_t;
 
+#define MBEDTLS_PK_MAX_EC_PUBKEY_RAW_LEN \
+    PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_VENDOR_ECC_MAX_CURVE_BITS)
+
 typedef struct mbedtls_pk_context {
     const mbedtls_pk_info_t *MBEDTLS_PRIVATE(pk_info);
     void *MBEDTLS_PRIVATE(pk_ctx);
+
+#if defined(MBEDTLS_PSA_CRYPTO_C)
+    mbedtls_svc_key_id_t MBEDTLS_PRIVATE(priv_id);
+#endif /* MBEDTLS_PSA_CRYPTO_C */
+
+#if defined(MBEDTLS_PK_USE_PSA_EC_DATA)
+    uint8_t MBEDTLS_PRIVATE(pub_raw)[MBEDTLS_PK_MAX_EC_PUBKEY_RAW_LEN];
+    size_t MBEDTLS_PRIVATE(pub_raw_len);
+    psa_ecc_family_t MBEDTLS_PRIVATE(ec_family);
+    size_t MBEDTLS_PRIVATE(ec_bits);
+#endif /* MBEDTLS_PK_USE_PSA_EC_DATA */
 } mbedtls_pk_context;
 
 #if defined(MBEDTLS_ECDSA_C) && defined(MBEDTLS_ECP_RESTARTABLE)

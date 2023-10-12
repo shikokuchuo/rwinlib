@@ -32,7 +32,6 @@ extern "C" {
 #endif
 
 #define MBEDTLS_ERR_THREADING_BAD_INPUT_DATA              -0x001C
-
 #define MBEDTLS_ERR_THREADING_MUTEX_ERROR                 -0x001E
 
 #if defined(MBEDTLS_THREADING_PTHREAD)
@@ -44,6 +43,7 @@ typedef struct mbedtls_threading_mutex_t {
 #endif
 
 #if defined(MBEDTLS_THREADING_ALT)
+
 #include "threading_alt.h"
 
 void mbedtls_threading_set_alt(void (*mutex_init)(mbedtls_threading_mutex_t *),
