@@ -15,19 +15,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #ifndef PSA_CRYPTO_BUILTIN_KEY_DERIVATION_H
@@ -79,11 +67,8 @@ typedef struct psa_tls12_prf_key_derivation_s {
 #endif
 
     uint8_t MBEDTLS_PRIVATE(left_in_block);
-
     uint8_t MBEDTLS_PRIVATE(block_number);
-
     psa_tls12_prf_key_derivation_state_t MBEDTLS_PRIVATE(state);
-
     uint8_t *MBEDTLS_PRIVATE(secret);
     size_t MBEDTLS_PRIVATE(secret_length);
     uint8_t *MBEDTLS_PRIVATE(seed);
@@ -96,7 +81,6 @@ typedef struct psa_tls12_prf_key_derivation_s {
 #endif /* MBEDTLS_PSA_BUILTIN_ALG_TLS12_PSK_TO_MS */
 
     uint8_t MBEDTLS_PRIVATE(Ai)[PSA_HASH_MAX_SIZE];
-
     uint8_t MBEDTLS_PRIVATE(output_block)[PSA_HASH_MAX_SIZE];
 } psa_tls12_prf_key_derivation_t;
 #endif /* MBEDTLS_PSA_BUILTIN_ALG_TLS12_PRF) ||

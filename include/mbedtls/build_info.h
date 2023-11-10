@@ -8,19 +8,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #ifndef MBEDTLS_BUILD_INFO_H
@@ -28,11 +16,11 @@
 
 #define MBEDTLS_VERSION_MAJOR  3
 #define MBEDTLS_VERSION_MINOR  5
-#define MBEDTLS_VERSION_PATCH  0
+#define MBEDTLS_VERSION_PATCH  1
 
-#define MBEDTLS_VERSION_NUMBER         0x03050000
-#define MBEDTLS_VERSION_STRING         "3.5.0"
-#define MBEDTLS_VERSION_STRING_FULL    "Mbed TLS 3.5.0"
+#define MBEDTLS_VERSION_NUMBER         0x03050100
+#define MBEDTLS_VERSION_STRING         "3.5.1"
+#define MBEDTLS_VERSION_STRING_FULL    "Mbed TLS 3.5.1"
 
 #if !defined(MBEDTLS_ARCH_IS_ARM64) && \
     (defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC))
@@ -82,7 +70,6 @@
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
 
-/* PSA crypto configuration */
 #if defined(MBEDTLS_PSA_CRYPTO_CONFIG)
 #if defined(MBEDTLS_PSA_CRYPTO_CONFIG_FILE)
 #include MBEDTLS_PSA_CRYPTO_CONFIG_FILE
@@ -94,28 +81,14 @@
 #endif
 #endif /* defined(MBEDTLS_PSA_CRYPTO_CONFIG) */
 
-/* Auto-enable MBEDTLS_CTR_DRBG_USE_128_BIT_KEY if
- * MBEDTLS_AES_ONLY_128_BIT_KEY_LENGTH and MBEDTLS_CTR_DRBG_C defined
- * to ensure a 128-bit key size in CTR_DRBG.
- */
 #if defined(MBEDTLS_AES_ONLY_128_BIT_KEY_LENGTH) && defined(MBEDTLS_CTR_DRBG_C)
 #define MBEDTLS_CTR_DRBG_USE_128_BIT_KEY
 #endif
 
-/* Auto-enable MBEDTLS_MD_C if needed by a module that didn't require it
- * in a previous release, to ensure backwards compatibility.
- */
 #if defined(MBEDTLS_PKCS5_C)
 #define MBEDTLS_MD_C
 #endif
 
-/* PSA crypto specific configuration options
- * - If config_psa.h reads a configuration option in preprocessor directive,
- *   this symbol should be set before its inclusion. (e.g. MBEDTLS_MD_C)
- * - If config_psa.h writes a configuration option in conditional directive,
- *   this symbol should be consulted after its inclusion.
- *   (e.g. MBEDTLS_MD_LIGHT)
- */
 #if defined(MBEDTLS_PSA_CRYPTO_CONFIG) /* PSA_WANT_xxx influences MBEDTLS_xxx */ || \
     defined(MBEDTLS_PSA_CRYPTO_C) /* MBEDTLS_xxx influences PSA_WANT_xxx */
 #include "mbedtls/config_psa.h"

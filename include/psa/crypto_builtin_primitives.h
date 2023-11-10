@@ -15,19 +15,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #ifndef PSA_CRYPTO_BUILTIN_PRIMITIVES_H
@@ -40,19 +28,13 @@
 #include "mbedtls/sha1.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/sha512.h"
-#include "mbedtls/sha3.h"
 
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_MD5) || \
-    defined(MBEDTLS_PSA_BUILTIN_ALG_RIPEMD160) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_1) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_224) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_256) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_384) || \
-    defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_512) || \
-    defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_224) || \
-    defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_256) || \
-    defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_384) || \
-    defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_512)
+    defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_512)
 #define MBEDTLS_PSA_BUILTIN_HASH
 #endif
 
@@ -62,9 +44,6 @@ typedef struct {
         unsigned dummy;
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_MD5)
         mbedtls_md5_context md5;
-#endif
-#if defined(MBEDTLS_PSA_BUILTIN_ALG_RIPEMD160)
-        mbedtls_ripemd160_context ripemd160;
 #endif
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_1)
         mbedtls_sha1_context sha1;
@@ -76,12 +55,6 @@ typedef struct {
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_512) || \
         defined(MBEDTLS_PSA_BUILTIN_ALG_SHA_384)
         mbedtls_sha512_context sha512;
-#endif
-#if defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_224) || \
-        defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_256) || \
-        defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_384) || \
-        defined(MBEDTLS_PSA_BUILTIN_ALG_SHA3_512)
-        mbedtls_sha3_context sha3;
 #endif
     } MBEDTLS_PRIVATE(ctx);
 } mbedtls_psa_hash_operation_t;
