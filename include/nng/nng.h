@@ -43,7 +43,6 @@ extern "C" {
 #endif
 #endif
 
-
 #define NNG_MAJOR_VERSION 1
 #define NNG_MINOR_VERSION 6
 #define NNG_PATCH_VERSION 0
