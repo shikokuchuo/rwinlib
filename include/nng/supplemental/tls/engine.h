@@ -17,7 +17,6 @@ typedef struct nng_tls_engine_conn nng_tls_engine_conn;
 typedef struct nng_tls_engine_config nng_tls_engine_config;
 
 typedef struct nng_tls_engine_conn_ops_s {
-
 	size_t size;
 
 	int (*init)(nng_tls_engine_conn *, void *, nng_tls_engine_config *);
@@ -40,7 +39,6 @@ typedef struct nng_tls_engine_conn_ops_s {
 } nng_tls_engine_conn_ops;
 
 typedef struct nng_tls_engine_config_ops_s {
-
 	size_t size;
 
 	int (*init)(nng_tls_engine_config *, nng_tls_mode);
@@ -67,7 +65,6 @@ typedef enum nng_tls_engine_version_e {
 } nng_tls_engine_version;
 
 typedef struct nng_tls_engine_s {
-
 	nng_tls_engine_version version;
 
 	nng_tls_engine_config_ops *config_ops;
