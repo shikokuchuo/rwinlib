@@ -1,5 +1,5 @@
 //
-// Copyright 2018 Staysail Systems, Inc. <info@staysail.tech>
+// Copyright 2023 Staysail Systems, Inc. <info@staysail.tech>
 // Copyright 2018 Capitar IT Group BV <info@capitar.com>
 //
 // This software is supplied under the terms of the MIT License, a
@@ -17,8 +17,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef uint64_t nng_time;
 
 NNG_DECL nng_time nng_clock(void);
 
@@ -57,6 +55,8 @@ NNG_DECL void nng_cv_wake(nng_cv *);
 NNG_DECL void nng_cv_wake1(nng_cv *);
 
 NNG_DECL uint32_t nng_random(void);
+
+NNG_DECL int nng_socket_pair(int [2]);
 
 #ifdef __cplusplus
 }

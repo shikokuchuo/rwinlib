@@ -1,5 +1,5 @@
 //
-// Copyright 2023 Staysail Systems, Inc. <info@staysail.tech>
+// Copyright 2024 Staysail Systems, Inc. <info@staysail.tech>
 // Copyright 2018 Capitar IT Group BV <info@capitar.com>
 //
 // This software is supplied under the terms of the MIT License, a
@@ -37,20 +37,21 @@ extern "C" {
 
 #ifndef NNG_DEPRECATED
 #if defined(__GNUC__) || defined(__clang__)
-#define NNG_DEPRECATED __attribute__ ((deprecated))
+#define NNG_DEPRECATED __attribute__((deprecated))
 #else
 #define NNG_DEPRECATED
 #endif
 #endif
 
 #define NNG_MAJOR_VERSION 1
-#define NNG_MINOR_VERSION 6
+#define NNG_MINOR_VERSION 7
 #define NNG_PATCH_VERSION 0
-#define NNG_RELEASE_SUFFIX "" // if non-empty (i.e. "pre"), this is a pre-release
+#define NNG_RELEASE_SUFFIX \
+	"" // if non-empty (i.e. "pre"), this is a pre-release
 
 #define NNG_MAXADDRLEN (128)
 
-#define NNG_PROTOCOL_NUMBER(maj, min) (((x) *16) + (y))
+#define NNG_PROTOCOL_NUMBER(maj, min) (((x) * 16) + (y))
 
 typedef struct nng_ctx_s {
 	uint32_t id;
@@ -72,12 +73,14 @@ typedef struct nng_socket_s {
 	uint32_t id;
 } nng_socket;
 
-typedef int32_t         nng_duration; // in milliseconds
+typedef int32_t nng_duration; // in milliseconds
+
+typedef uint64_t nng_time;
+
 typedef struct nng_msg  nng_msg;
 typedef struct nng_stat nng_stat;
 typedef struct nng_aio  nng_aio;
 
-// Initializers.
 // clang-format off
 #define NNG_PIPE_INITIALIZER { 0 }
 #define NNG_SOCKET_INITIALIZER { 0 }
@@ -157,7 +160,7 @@ enum nng_sockaddr_family {
 };
 
 typedef struct nng_iov {
-	void * iov_buf;
+	void  *iov_buf;
 	size_t iov_len;
 } nng_iov;
 
@@ -356,13 +359,16 @@ NNG_DECL void *nng_aio_get_output(nng_aio *, unsigned);
 
 NNG_DECL void nng_aio_set_timeout(nng_aio *, nng_duration);
 
+NNG_DECL void nng_aio_set_expire(nng_aio *, nng_time);
+
 NNG_DECL int nng_aio_set_iov(nng_aio *, unsigned, const nng_iov *);
 
 NNG_DECL bool nng_aio_begin(nng_aio *);
 
 NNG_DECL void nng_aio_finish(nng_aio *, int);
 
-typedef void (*nng_aio_cancelfn)(nng_aio *, void *, int);
+typedef void  (*nng_aio_cancelfn)(nng_aio *, void *, int);
+
 NNG_DECL void nng_aio_defer(nng_aio *, nng_aio_cancelfn, void *);
 
 NNG_DECL void nng_sleep_aio(nng_duration, nng_aio *);
@@ -372,9 +378,9 @@ NNG_DECL void     nng_msg_free(nng_msg *);
 NNG_DECL int      nng_msg_realloc(nng_msg *, size_t);
 NNG_DECL int      nng_msg_reserve(nng_msg *, size_t);
 NNG_DECL size_t   nng_msg_capacity(nng_msg *);
-NNG_DECL void *   nng_msg_header(nng_msg *);
+NNG_DECL void    *nng_msg_header(nng_msg *);
 NNG_DECL size_t   nng_msg_header_len(const nng_msg *);
-NNG_DECL void *   nng_msg_body(nng_msg *);
+NNG_DECL void    *nng_msg_body(nng_msg *);
 NNG_DECL size_t   nng_msg_len(const nng_msg *);
 NNG_DECL int      nng_msg_append(nng_msg *, const void *, size_t);
 NNG_DECL int      nng_msg_insert(nng_msg *, const void *, size_t);
@@ -430,7 +436,7 @@ NNG_DECL nng_socket   nng_pipe_socket(nng_pipe);
 NNG_DECL nng_dialer   nng_pipe_dialer(nng_pipe);
 NNG_DECL nng_listener nng_pipe_listener(nng_pipe);
 
-#define NNG_FLAG_ALLOC 1u // Recv to allocate receive buffer
+#define NNG_FLAG_ALLOC 1u    // Recv to allocate receive buffer
 #define NNG_FLAG_NONBLOCK 2u // Non-blocking operations
 
 #define NNG_OPT_SOCKNAME "socket-name"
@@ -479,13 +485,17 @@ NNG_DECL nng_listener nng_pipe_listener(nng_pipe);
 
 #define NNG_OPT_IPC_PERMISSIONS "ipc:permissions"
 
-#define NNG_OPT_IPC_PEER_UID "ipc:peer-uid"
+#define NNG_OPT_PEER_UID "ipc:peer-uid"
+#define NNG_OPT_IPC_PEER_UID NNG_OPT_PEER_UID
 
-#define NNG_OPT_IPC_PEER_GID "ipc:peer-gid"
+#define NNG_OPT_PEER_GID "ipc:peer-gid"
+#define NNG_OPT_IPC_PEER_GID NNG_OPT_PEER_GID
 
-#define NNG_OPT_IPC_PEER_PID "ipc:peer-pid"
+#define NNG_OPT_PEER_PID "ipc:peer-pid"
+#define NNG_OPT_IPC_PEER_PID NNG_OPT_PEER_PID
 
-#define NNG_OPT_IPC_PEER_ZONEID "ipc:peer-zoneid"
+#define NNG_OPT_PEER_ZONEID "ipc:peer-zoneid"
+#define NNG_OPT_IPC_PEER_ZONEID NNG_OPT_PEER_ZONEID
 
 #define NNG_OPT_WS_REQUEST_HEADERS "ws:request-headers"
 
@@ -506,6 +516,8 @@ NNG_DECL nng_listener nng_pipe_listener(nng_pipe);
 #define NNG_OPT_WS_SEND_TEXT "ws:send-text"
 
 #define NNG_OPT_WS_RECV_TEXT "ws:recv-text"
+
+#define NNG_OPT_SOCKET_FD "socket:fd"
 
 NNG_DECL int nng_stats_get(nng_stat **);
 
@@ -733,6 +745,20 @@ NNG_DECL int nng_stream_listener_set_ptr(
     nng_stream_listener *, const char *, void *);
 NNG_DECL int nng_stream_listener_set_addr(
     nng_stream_listener *, const char *, const nng_sockaddr *);
+    
+typedef int   nng_init_parameter;
+NNG_DECL void nng_init_set_parameter(nng_init_parameter, uint64_t);
+
+enum {
+	NNG_INIT_PARAMETER_NONE = 0,
+	NNG_INIT_NUM_TASK_THREADS,
+	NNG_INIT_NUM_EXPIRE_THREADS,
+	NNG_INIT_NUM_POLLER_THREADS,
+	NNG_INIT_NUM_RESOLVER_THREADS,
+	NNG_INIT_MAX_TASK_THREADS,
+	NNG_INIT_MAX_EXPIRE_THREADS,
+	NNG_INIT_MAX_POLLER_THREADS,
+};
 
 #ifdef __cplusplus
 }
