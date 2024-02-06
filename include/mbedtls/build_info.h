@@ -16,11 +16,11 @@
 
 #define MBEDTLS_VERSION_MAJOR  3
 #define MBEDTLS_VERSION_MINOR  5
-#define MBEDTLS_VERSION_PATCH  1
+#define MBEDTLS_VERSION_PATCH  2
 
-#define MBEDTLS_VERSION_NUMBER         0x03050100
-#define MBEDTLS_VERSION_STRING         "3.5.1"
-#define MBEDTLS_VERSION_STRING_FULL    "Mbed TLS 3.5.1"
+#define MBEDTLS_VERSION_NUMBER         0x03050200
+#define MBEDTLS_VERSION_STRING         "3.5.2"
+#define MBEDTLS_VERSION_STRING_FULL    "Mbed TLS 3.5.2"
 
 #if !defined(MBEDTLS_ARCH_IS_ARM64) && \
     (defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC))
