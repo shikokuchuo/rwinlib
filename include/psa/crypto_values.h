@@ -66,6 +66,8 @@
 
 #define PSA_ERROR_INSUFFICIENT_DATA     ((psa_status_t)-143)
 
+#define PSA_ERROR_SERVICE_FAILURE       ((psa_status_t)-144)
+
 #define PSA_ERROR_INVALID_HANDLE        ((psa_status_t)-136)
 
 #define PSA_ERROR_DATA_CORRUPT          ((psa_status_t)-152)

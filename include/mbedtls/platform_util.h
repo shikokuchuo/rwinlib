@@ -23,9 +23,6 @@
 extern "C" {
 #endif
 
-#define MBEDTLS_INTERNAL_VALIDATE_RET(cond, ret)  do { } while (0)
-#define MBEDTLS_INTERNAL_VALIDATE(cond)           do { } while (0)
-
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
 #if defined(MBEDTLS_DEPRECATED_WARNING)
 #define MBEDTLS_DEPRECATED __attribute__((deprecated))

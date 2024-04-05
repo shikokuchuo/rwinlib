@@ -32,7 +32,14 @@
 
 #include "mbedtls/build_info.h"
 
+/* In case AES_C is defined then it is the primary option for backward
+ * compatibility purposes. If that's not available, PSA is used instead */
+#if defined(MBEDTLS_AES_C)
 #include "mbedtls/aes.h"
+#else
+#include "psa/crypto.h"
+#endif
+
 #include "entropy.h"
 
 #if defined(MBEDTLS_THREADING_C)
@@ -102,13 +109,24 @@ extern "C" {
 #define MBEDTLS_CTR_DRBG_ENTROPY_NONCE_LEN (MBEDTLS_CTR_DRBG_ENTROPY_LEN + 1) / 2
 #endif
 
+#if !defined(MBEDTLS_AES_C)
+typedef struct mbedtls_ctr_drbg_psa_context {
+    mbedtls_svc_key_id_t key_id;
+    psa_cipher_operation_t operation;
+} mbedtls_ctr_drbg_psa_context;
+#endif
+
 typedef struct mbedtls_ctr_drbg_context {
     unsigned char MBEDTLS_PRIVATE(counter)[16];
     int MBEDTLS_PRIVATE(reseed_counter);
     int MBEDTLS_PRIVATE(prediction_resistance);
     size_t MBEDTLS_PRIVATE(entropy_len);
     int MBEDTLS_PRIVATE(reseed_interval);
+#if defined(MBEDTLS_AES_C)
     mbedtls_aes_context MBEDTLS_PRIVATE(aes_ctx);
+#else
+    mbedtls_ctr_drbg_psa_context MBEDTLS_PRIVATE(psa_ctx);
+#endif
     int(*MBEDTLS_PRIVATE(f_entropy))(void *, unsigned char *, size_t);
     void *MBEDTLS_PRIVATE(p_entropy);
 #if defined(MBEDTLS_THREADING_C)

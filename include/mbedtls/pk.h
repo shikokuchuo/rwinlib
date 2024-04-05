@@ -28,7 +28,7 @@
 #include "mbedtls/ecdsa.h"
 #endif
 
-#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_PSA_CRYPTO_C)
+#if defined(MBEDTLS_PSA_CRYPTO_CLIENT)
 #include "psa/crypto.h"
 #endif
 
@@ -99,10 +99,6 @@ typedef struct mbedtls_pk_rsassa_pss_options {
 #define MBEDTLS_PK_USE_PSA_EC_DATA
 #endif
 
-#if defined(MBEDTLS_PK_USE_PSA_EC_DATA) || defined(MBEDTLS_ECP_C)
-#define MBEDTLS_PK_HAVE_ECC_KEYS
-#endif /* MBEDTLS_PK_USE_PSA_EC_DATA || MBEDTLS_ECP_C */
-
 typedef enum {
     MBEDTLS_PK_DEBUG_NONE = 0,
     MBEDTLS_PK_DEBUG_MPI,
@@ -126,10 +122,9 @@ typedef struct mbedtls_pk_info_t mbedtls_pk_info_t;
 typedef struct mbedtls_pk_context {
     const mbedtls_pk_info_t *MBEDTLS_PRIVATE(pk_info);
     void *MBEDTLS_PRIVATE(pk_ctx);
-
-#if defined(MBEDTLS_PSA_CRYPTO_C)
+#if defined(MBEDTLS_USE_PSA_CRYPTO)
     mbedtls_svc_key_id_t MBEDTLS_PRIVATE(priv_id);
-#endif /* MBEDTLS_PSA_CRYPTO_C */
+#endif /* MBEDTLS_USE_PSA_CRYPTO */
 
 #if defined(MBEDTLS_PK_USE_PSA_EC_DATA)
     uint8_t MBEDTLS_PRIVATE(pub_raw)[MBEDTLS_PK_MAX_EC_PUBKEY_RAW_LEN];
@@ -207,6 +202,21 @@ int mbedtls_pk_can_do_ext(const mbedtls_pk_context *ctx, psa_algorithm_t alg,
                           psa_key_usage_t usage);
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
 
+#if defined(MBEDTLS_PSA_CRYPTO_CLIENT)
+
+int mbedtls_pk_get_psa_attributes(const mbedtls_pk_context *pk,
+                                  psa_key_usage_t usage,
+                                  psa_key_attributes_t *attributes);
+
+int mbedtls_pk_import_into_psa(const mbedtls_pk_context *pk,
+                               const psa_key_attributes_t *attributes,
+                               mbedtls_svc_key_id_t *key_id);
+
+int mbedtls_pk_copy_from_psa(mbedtls_svc_key_id_t key_id, mbedtls_pk_context *pk);
+
+int mbedtls_pk_copy_public_from_psa(mbedtls_svc_key_id_t key_id, mbedtls_pk_context *pk);
+#endif /* MBEDTLS_PSA_CRYPTO_CLIENT */
+
 int mbedtls_pk_verify(mbedtls_pk_context *ctx, mbedtls_md_type_t md_alg,
                       const unsigned char *hash, size_t hash_len,
                       const unsigned char *sig, size_t sig_len);
@@ -227,8 +237,6 @@ int mbedtls_pk_sign(mbedtls_pk_context *ctx, mbedtls_md_type_t md_alg,
                     unsigned char *sig, size_t sig_size, size_t *sig_len,
                     int (*f_rng)(void *, unsigned char *, size_t), void *p_rng);
 
-#if defined(MBEDTLS_PSA_CRYPTO_C)
-
 int mbedtls_pk_sign_ext(mbedtls_pk_type_t pk_type,
                         mbedtls_pk_context *ctx,
                         mbedtls_md_type_t md_alg,
@@ -236,7 +244,6 @@ int mbedtls_pk_sign_ext(mbedtls_pk_type_t pk_type,
                         unsigned char *sig, size_t sig_size, size_t *sig_len,
                         int (*f_rng)(void *, unsigned char *, size_t),
                         void *p_rng);
-#endif /* MBEDTLS_PSA_CRYPTO_C */
 
 int mbedtls_pk_sign_restartable(mbedtls_pk_context *ctx,
                                 mbedtls_md_type_t md_alg,
@@ -339,19 +346,6 @@ int mbedtls_pk_parse_subpubkey(unsigned char **p, const unsigned char *end,
 int mbedtls_pk_write_pubkey(unsigned char **p, unsigned char *start,
                             const mbedtls_pk_context *key);
 #endif /* MBEDTLS_PK_WRITE_C */
-
-#if defined(MBEDTLS_FS_IO)
-int mbedtls_pk_load_file(const char *path, unsigned char **buf, size_t *n);
-#endif
-
-#if defined(MBEDTLS_USE_PSA_CRYPTO)
-
-int mbedtls_pk_wrap_as_opaque(mbedtls_pk_context *pk,
-                              mbedtls_svc_key_id_t *key,
-                              psa_algorithm_t alg,
-                              psa_key_usage_t usage,
-                              psa_algorithm_t alg2);
-#endif /* MBEDTLS_USE_PSA_CRYPTO */
 
 #ifdef __cplusplus
 }

@@ -122,6 +122,8 @@ int mbedtls_rsa_export_raw(const mbedtls_rsa_context *ctx,
 int mbedtls_rsa_export_crt(const mbedtls_rsa_context *ctx,
                            mbedtls_mpi *DP, mbedtls_mpi *DQ, mbedtls_mpi *QP);
 
+size_t mbedtls_rsa_get_bitlen(const mbedtls_rsa_context *ctx);
+
 size_t mbedtls_rsa_get_len(const mbedtls_rsa_context *ctx);
 
 int mbedtls_rsa_gen_key(mbedtls_rsa_context *ctx,
@@ -209,6 +211,9 @@ int mbedtls_rsa_rsassa_pkcs1_v15_sign(mbedtls_rsa_context *ctx,
                                       const unsigned char *hash,
                                       unsigned char *sig);
 
+
+#if defined(MBEDTLS_PKCS1_V21)
+
 int mbedtls_rsa_rsassa_pss_sign_ext(mbedtls_rsa_context *ctx,
                                     int (*f_rng)(void *, unsigned char *, size_t),
                                     void *p_rng,
@@ -225,6 +230,7 @@ int mbedtls_rsa_rsassa_pss_sign(mbedtls_rsa_context *ctx,
                                 unsigned int hashlen,
                                 const unsigned char *hash,
                                 unsigned char *sig);
+#endif /* MBEDTLS_PKCS1_V21 */
 
 int mbedtls_rsa_pkcs1_verify(mbedtls_rsa_context *ctx,
                              mbedtls_md_type_t md_alg,

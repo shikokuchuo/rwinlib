@@ -292,7 +292,7 @@ static inline size_t mbedtls_cipher_info_get_key_bitlen(
     if (info == NULL) {
         return 0;
     } else {
-        return info->MBEDTLS_PRIVATE(key_bitlen) << MBEDTLS_KEY_BITLEN_SHIFT;
+        return ((size_t) info->MBEDTLS_PRIVATE(key_bitlen)) << MBEDTLS_KEY_BITLEN_SHIFT;
     }
 }
 
@@ -365,7 +365,6 @@ int MBEDTLS_DEPRECATED mbedtls_cipher_setup_psa(mbedtls_cipher_context_t *ctx,
 static inline unsigned int mbedtls_cipher_get_block_size(
     const mbedtls_cipher_context_t *ctx)
 {
-    MBEDTLS_INTERNAL_VALIDATE_RET(ctx != NULL, 0);
     if (ctx->MBEDTLS_PRIVATE(cipher_info) == NULL) {
         return 0;
     }
@@ -376,7 +375,6 @@ static inline unsigned int mbedtls_cipher_get_block_size(
 static inline mbedtls_cipher_mode_t mbedtls_cipher_get_cipher_mode(
     const mbedtls_cipher_context_t *ctx)
 {
-    MBEDTLS_INTERNAL_VALIDATE_RET(ctx != NULL, MBEDTLS_MODE_NONE);
     if (ctx->MBEDTLS_PRIVATE(cipher_info) == NULL) {
         return MBEDTLS_MODE_NONE;
     }
@@ -387,7 +385,6 @@ static inline mbedtls_cipher_mode_t mbedtls_cipher_get_cipher_mode(
 static inline int mbedtls_cipher_get_iv_size(
     const mbedtls_cipher_context_t *ctx)
 {
-    MBEDTLS_INTERNAL_VALIDATE_RET(ctx != NULL, 0);
     if (ctx->MBEDTLS_PRIVATE(cipher_info) == NULL) {
         return 0;
     }
@@ -403,8 +400,6 @@ static inline int mbedtls_cipher_get_iv_size(
 static inline mbedtls_cipher_type_t mbedtls_cipher_get_type(
     const mbedtls_cipher_context_t *ctx)
 {
-    MBEDTLS_INTERNAL_VALIDATE_RET(
-        ctx != NULL, MBEDTLS_CIPHER_NONE);
     if (ctx->MBEDTLS_PRIVATE(cipher_info) == NULL) {
         return MBEDTLS_CIPHER_NONE;
     }
@@ -415,7 +410,6 @@ static inline mbedtls_cipher_type_t mbedtls_cipher_get_type(
 static inline const char *mbedtls_cipher_get_name(
     const mbedtls_cipher_context_t *ctx)
 {
-    MBEDTLS_INTERNAL_VALIDATE_RET(ctx != NULL, 0);
     if (ctx->MBEDTLS_PRIVATE(cipher_info) == NULL) {
         return 0;
     }
@@ -426,8 +420,6 @@ static inline const char *mbedtls_cipher_get_name(
 static inline int mbedtls_cipher_get_key_bitlen(
     const mbedtls_cipher_context_t *ctx)
 {
-    MBEDTLS_INTERNAL_VALIDATE_RET(
-        ctx != NULL, MBEDTLS_KEY_LENGTH_NONE);
     if (ctx->MBEDTLS_PRIVATE(cipher_info) == NULL) {
         return MBEDTLS_KEY_LENGTH_NONE;
     }
@@ -439,8 +431,6 @@ static inline int mbedtls_cipher_get_key_bitlen(
 static inline mbedtls_operation_t mbedtls_cipher_get_operation(
     const mbedtls_cipher_context_t *ctx)
 {
-    MBEDTLS_INTERNAL_VALIDATE_RET(
-        ctx != NULL, MBEDTLS_OPERATION_NONE);
     if (ctx->MBEDTLS_PRIVATE(cipher_info) == NULL) {
         return MBEDTLS_OPERATION_NONE;
     }

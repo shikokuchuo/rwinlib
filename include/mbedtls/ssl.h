@@ -60,7 +60,8 @@
 #define MBEDTLS_ERR_SSL_BAD_CERTIFICATE                   -0x7A00
 #define MBEDTLS_ERR_SSL_RECEIVED_NEW_SESSION_TICKET       -0x7B00
 #define MBEDTLS_ERR_SSL_CANNOT_READ_EARLY_DATA            -0x7B80
-#define MBEDTLS_ERR_SSL_CANNOT_WRITE_EARLY_DATA           -0x7C00
+#define MBEDTLS_ERR_SSL_RECEIVED_EARLY_DATA               -0x7C00
+#define MBEDTLS_ERR_SSL_CANNOT_WRITE_EARLY_DATA           -0x7C80
 #define MBEDTLS_ERR_SSL_CACHE_ENTRY_NOT_FOUND             -0x7E80
 #define MBEDTLS_ERR_SSL_ALLOC_FAILED                      -0x7F00
 #define MBEDTLS_ERR_SSL_HW_ACCEL_FAILED                   -0x7F80
@@ -219,6 +220,10 @@
 
 #define MBEDTLS_SSL_DTLS_TIMEOUT_DFL_MIN    1000
 #define MBEDTLS_SSL_DTLS_TIMEOUT_DFL_MAX   60000
+
+#define MBEDTLS_SSL_EARLY_DATA_NO_DISCARD 0
+#define MBEDTLS_SSL_EARLY_DATA_TRY_TO_DEPROTECT_AND_DISCARD 1
+#define MBEDTLS_SSL_EARLY_DATA_DISCARD 2
 
 #if !defined(MBEDTLS_SSL_IN_CONTENT_LEN)
 #define MBEDTLS_SSL_IN_CONTENT_LEN 16384
@@ -419,7 +424,7 @@
 
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3) && \
     defined(MBEDTLS_SSL_SESSION_TICKETS) && \
-    defined(MBEDTLS_AES_C) && defined(MBEDTLS_GCM_C) && \
+    defined(MBEDTLS_SSL_HAVE_AES) && defined(MBEDTLS_SSL_HAVE_GCM) && \
     defined(MBEDTLS_MD_CAN_SHA384)
 #define MBEDTLS_PSK_MAX_LEN 48
 #else
@@ -487,7 +492,6 @@ typedef enum {
     MBEDTLS_SSL_SERVER_FINISHED,
     MBEDTLS_SSL_FLUSH_BUFFERS,
     MBEDTLS_SSL_HANDSHAKE_WRAPUP,
-
     MBEDTLS_SSL_NEW_SESSION_TICKET,
     MBEDTLS_SSL_SERVER_HELLO_VERIFY_REQUEST_SENT,
     MBEDTLS_SSL_HELLO_RETRY_REQUEST,
@@ -504,6 +508,14 @@ typedef enum {
     MBEDTLS_SSL_TLS1_3_NEW_SESSION_TICKET_FLUSH,
 }
 mbedtls_ssl_states;
+
+#if defined(MBEDTLS_SSL_EARLY_DATA) && defined(MBEDTLS_SSL_CLI_C)
+typedef enum {
+    MBEDTLS_SSL_EARLY_DATA_STATUS_NOT_INDICATED,
+    MBEDTLS_SSL_EARLY_DATA_STATUS_ACCEPTED,
+    MBEDTLS_SSL_EARLY_DATA_STATUS_REJECTED,
+} mbedtls_ssl_early_data_status;
+#endif /* MBEDTLS_SSL_EARLY_DATA && MBEDTLS_SSL_CLI_C */
 
 typedef int mbedtls_ssl_send_t(void *ctx,
                                const unsigned char *buf,
@@ -642,7 +654,13 @@ struct mbedtls_ssl_session {
     unsigned char MBEDTLS_PRIVATE(mfl_code);
 #endif /* MBEDTLS_SSL_MAX_FRAGMENT_LENGTH */
 
+/*!< RecordSizeLimit received from the peer */
+#if defined(MBEDTLS_SSL_RECORD_SIZE_LIMIT)
+    uint16_t MBEDTLS_PRIVATE(record_size_limit);
+#endif /* MBEDTLS_SSL_RECORD_SIZE_LIMIT */
+
     unsigned char MBEDTLS_PRIVATE(exported);
+    uint8_t MBEDTLS_PRIVATE(endpoint);
 
     mbedtls_ssl_protocol_version MBEDTLS_PRIVATE(tls_version);
 
@@ -671,10 +689,14 @@ struct mbedtls_ssl_session {
     uint32_t MBEDTLS_PRIVATE(ticket_lifetime);
 #endif /* MBEDTLS_SSL_SESSION_TICKETS && MBEDTLS_SSL_CLI_C */
 
+#if defined(MBEDTLS_SSL_SESSION_TICKETS) && defined(MBEDTLS_SSL_SRV_C) && \
+    defined(MBEDTLS_HAVE_TIME)
+    mbedtls_ms_time_t MBEDTLS_PRIVATE(ticket_creation_time);
+#endif
+
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3) && defined(MBEDTLS_SSL_SESSION_TICKETS)
-    uint8_t MBEDTLS_PRIVATE(endpoint);
-    uint8_t MBEDTLS_PRIVATE(ticket_flags);
     uint32_t MBEDTLS_PRIVATE(ticket_age_add);
+    uint8_t MBEDTLS_PRIVATE(ticket_flags);
     uint8_t MBEDTLS_PRIVATE(resumption_key_len);
     unsigned char MBEDTLS_PRIVATE(resumption_key)[MBEDTLS_SSL_TLS1_3_TICKET_RESUMPTION_KEY_LEN];
 
@@ -682,11 +704,19 @@ struct mbedtls_ssl_session {
     char *MBEDTLS_PRIVATE(hostname);
 #endif /* MBEDTLS_SSL_SERVER_NAME_INDICATION && MBEDTLS_SSL_CLI_C */
 
-#if defined(MBEDTLS_HAVE_TIME) && defined(MBEDTLS_SSL_CLI_C)
-    mbedtls_time_t MBEDTLS_PRIVATE(ticket_received);
-#endif /* MBEDTLS_HAVE_TIME && MBEDTLS_SSL_CLI_C */
+#if defined(MBEDTLS_SSL_EARLY_DATA) && defined(MBEDTLS_SSL_ALPN) && defined(MBEDTLS_SSL_SRV_C)
+    char *ticket_alpn;
+#endif
 
+#if defined(MBEDTLS_HAVE_TIME) && defined(MBEDTLS_SSL_CLI_C)
+    /*! Time in milliseconds when the last ticket was received. */
+    mbedtls_ms_time_t MBEDTLS_PRIVATE(ticket_reception_time);
+#endif
 #endif /*  MBEDTLS_SSL_PROTO_TLS1_3 && MBEDTLS_SSL_SESSION_TICKETS */
+
+#if defined(MBEDTLS_SSL_EARLY_DATA)
+    uint32_t MBEDTLS_PRIVATE(max_early_data_size);
+#endif
 
 #if defined(MBEDTLS_SSL_ENCRYPT_THEN_MAC)
     int MBEDTLS_PRIVATE(encrypt_then_mac);
@@ -943,6 +973,10 @@ struct mbedtls_ssl_context {
 
     mbedtls_ssl_protocol_version MBEDTLS_PRIVATE(tls_version);
 
+#if defined(MBEDTLS_SSL_EARLY_DATA) && defined(MBEDTLS_SSL_CLI_C)
+    int MBEDTLS_PRIVATE(early_data_state);
+#endif
+
     unsigned MBEDTLS_PRIVATE(badmac_seen);
 
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
@@ -1018,6 +1052,13 @@ struct mbedtls_ssl_context {
     uint8_t MBEDTLS_PRIVATE(disable_datagram_packing);
 #endif /* MBEDTLS_SSL_PROTO_DTLS */
 
+#if defined(MBEDTLS_SSL_EARLY_DATA)
+#if defined(MBEDTLS_SSL_SRV_C)
+    uint8_t MBEDTLS_PRIVATE(discard_early_data_record);
+#endif
+    uint32_t MBEDTLS_PRIVATE(total_early_data_size);
+#endif /* MBEDTLS_SSL_EARLY_DATA */
+
     unsigned char *MBEDTLS_PRIVATE(out_buf);
     unsigned char *MBEDTLS_PRIVATE(out_ctr);
     unsigned char *MBEDTLS_PRIVATE(out_hdr);
@@ -1072,10 +1113,6 @@ struct mbedtls_ssl_context {
     uint8_t MBEDTLS_PRIVATE(negotiate_cid);
 #endif /* MBEDTLS_SSL_DTLS_CONNECTION_ID */
 
-#if defined(MBEDTLS_SSL_EARLY_DATA) && defined(MBEDTLS_SSL_CLI_C)
-    int MBEDTLS_PRIVATE(early_data_status);
-#endif /* MBEDTLS_SSL_EARLY_DATA && MBEDTLS_SSL_CLI_C */
-
     mbedtls_ssl_export_keys_t *MBEDTLS_PRIVATE(f_export_keys);
     void *MBEDTLS_PRIVATE(p_export_keys);
 
@@ -1104,18 +1141,18 @@ void mbedtls_ssl_conf_transport(mbedtls_ssl_config *conf, int transport);
 
 void mbedtls_ssl_conf_authmode(mbedtls_ssl_config *conf, int authmode);
 
-#if defined(MBEDTLS_SSL_PROTO_TLS1_3) && defined(MBEDTLS_SSL_EARLY_DATA)
+#if defined(MBEDTLS_SSL_EARLY_DATA)
 
-void mbedtls_ssl_tls13_conf_early_data(mbedtls_ssl_config *conf,
-                                       int early_data_enabled);
+void mbedtls_ssl_conf_early_data(mbedtls_ssl_config *conf,
+                                 int early_data_enabled);
 
 #if defined(MBEDTLS_SSL_SRV_C)
 
-void mbedtls_ssl_tls13_conf_max_early_data_size(
+void mbedtls_ssl_conf_max_early_data_size(
     mbedtls_ssl_config *conf, uint32_t max_early_data_size);
 #endif /* MBEDTLS_SSL_SRV_C */
 
-#endif /* MBEDTLS_SSL_PROTO_TLS1_3 && MBEDTLS_SSL_EARLY_DATA */
+#endif /* MBEDTLS_SSL_EARLY_DATA */
 
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 
@@ -1213,7 +1250,39 @@ void mbedtls_ssl_conf_session_tickets_cb(mbedtls_ssl_config *conf,
                                          mbedtls_ssl_ticket_write_t *f_ticket_write,
                                          mbedtls_ssl_ticket_parse_t *f_ticket_parse,
                                          void *p_ticket);
+
+#if defined(MBEDTLS_HAVE_TIME)
+
+static inline int mbedtls_ssl_session_get_ticket_creation_time(
+    mbedtls_ssl_session *session, mbedtls_ms_time_t *ticket_creation_time)
+{
+    if (session == NULL || ticket_creation_time == NULL ||
+        session->MBEDTLS_PRIVATE(endpoint) != MBEDTLS_SSL_IS_SERVER) {
+        return MBEDTLS_ERR_SSL_BAD_INPUT_DATA;
+    }
+
+    *ticket_creation_time = session->MBEDTLS_PRIVATE(ticket_creation_time);
+
+    return 0;
+}
+#endif /* MBEDTLS_HAVE_TIME */
 #endif /* MBEDTLS_SSL_SESSION_TICKETS && MBEDTLS_SSL_SRV_C */
+
+static inline unsigned const char (*mbedtls_ssl_session_get_id(const mbedtls_ssl_session *
+                                                               session))[32]
+{
+    return &session->MBEDTLS_PRIVATE(id);
+}
+
+static inline size_t mbedtls_ssl_session_get_id_len(const mbedtls_ssl_session *session)
+{
+    return session->MBEDTLS_PRIVATE(id_len);
+}
+
+static inline int mbedtls_ssl_session_get_ciphersuite_id(const mbedtls_ssl_session *session)
+{
+    return session->MBEDTLS_PRIVATE(ciphersuite);
+}
 
 void mbedtls_ssl_set_export_keys_cb(mbedtls_ssl_context *ssl,
                                     mbedtls_ssl_export_keys_t *f_export_keys,
@@ -1705,10 +1774,6 @@ int mbedtls_ssl_read_early_data(mbedtls_ssl_context *ssl,
 
 int mbedtls_ssl_write_early_data(mbedtls_ssl_context *ssl,
                                  const unsigned char *buf, size_t len);
-
-#define MBEDTLS_SSL_EARLY_DATA_STATUS_NOT_SENT  0
-#define MBEDTLS_SSL_EARLY_DATA_STATUS_ACCEPTED  1
-#define MBEDTLS_SSL_EARLY_DATA_STATUS_REJECTED  2
 
 int mbedtls_ssl_get_early_data_status(mbedtls_ssl_context *ssl);
 #endif /* MBEDTLS_SSL_CLI_C */

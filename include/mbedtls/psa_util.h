@@ -14,34 +14,47 @@
 
 #include "mbedtls/build_info.h"
 
-#if defined(MBEDTLS_PSA_CRYPTO_C)
+#include "psa/crypto.h"
 
-typedef int mbedtls_f_rng_t(void *p_rng, unsigned char *output, size_t output_size);
+#include <mbedtls/asn1write.h>
 
-#if defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG)
+#if defined(MBEDTLS_PSA_CRYPTO_CLIENT)
 
 int mbedtls_psa_get_random(void *p_rng,
                            unsigned char *output,
                            size_t output_size);
 
-#define MBEDTLS_PSA_RANDOM_STATE NULL
+#define MBEDTLS_PSA_RANDOM_STATE    NULL
 
-#else /* !defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG) */
+#if defined(PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY)
+#include <mbedtls/ecp.h>
 
-#if defined(MBEDTLS_CTR_DRBG_C)
-#include "mbedtls/ctr_drbg.h"
-typedef mbedtls_ctr_drbg_context mbedtls_psa_drbg_context_t;
-static mbedtls_f_rng_t *const mbedtls_psa_get_random = mbedtls_ctr_drbg_random;
-#elif defined(MBEDTLS_HMAC_DRBG_C)
-#include "mbedtls/hmac_drbg.h"
-typedef mbedtls_hmac_drbg_context mbedtls_psa_drbg_context_t;
-static mbedtls_f_rng_t *const mbedtls_psa_get_random = mbedtls_hmac_drbg_random;
-#endif
-extern mbedtls_psa_drbg_context_t *const mbedtls_psa_random_state;
+psa_ecc_family_t mbedtls_ecc_group_to_psa(mbedtls_ecp_group_id grpid,
+                                          size_t *bits);
 
-#define MBEDTLS_PSA_RANDOM_STATE mbedtls_psa_random_state
+mbedtls_ecp_group_id mbedtls_ecc_group_from_psa(psa_ecc_family_t family,
+                                                size_t bits);
+#endif /* PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY */
 
-#endif /* !defined(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG) */
+static inline psa_algorithm_t mbedtls_md_psa_alg_from_type(mbedtls_md_type_t md_type)
+{
+    return PSA_ALG_CATEGORY_HASH | (psa_algorithm_t) md_type;
+}
 
-#endif /* MBEDTLS_PSA_CRYPTO_C */
+static inline mbedtls_md_type_t mbedtls_md_type_from_psa_alg(psa_algorithm_t psa_alg)
+{
+    return (mbedtls_md_type_t) (psa_alg & PSA_ALG_HASH_MASK);
+}
+#endif /* MBEDTLS_PSA_CRYPTO_CLIENT */
+
+#if defined(MBEDTLS_PSA_UTIL_HAVE_ECDSA)
+
+int mbedtls_ecdsa_raw_to_der(size_t bits, const unsigned char *raw, size_t raw_len,
+                             unsigned char *der, size_t der_size, size_t *der_len);
+
+int mbedtls_ecdsa_der_to_raw(size_t bits, const unsigned char *der, size_t der_len,
+                             unsigned char *raw, size_t raw_size, size_t *raw_len);
+
+#endif /* MBEDTLS_PSA_UTIL_HAVE_ECDSA */
+
 #endif /* MBEDTLS_PSA_UTIL_H */

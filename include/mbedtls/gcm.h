@@ -24,6 +24,10 @@
 
 #include "mbedtls/cipher.h"
 
+#if defined(MBEDTLS_BLOCK_CIPHER_C)
+#include "mbedtls/block_cipher.h"
+#endif
+
 #include <stdint.h>
 
 #define MBEDTLS_GCM_ENCRYPT     1
@@ -37,18 +41,35 @@
 extern "C" {
 #endif
 
+#if !defined(MBEDTLS_GCM_ALT)
+
+#if defined(MBEDTLS_GCM_LARGE_TABLE)
+#define MBEDTLS_GCM_HTABLE_SIZE 256
+#else
+#define MBEDTLS_GCM_HTABLE_SIZE 16
+#endif
+
 typedef struct mbedtls_gcm_context {
+#if defined(MBEDTLS_BLOCK_CIPHER_C)
+    mbedtls_block_cipher_context_t MBEDTLS_PRIVATE(block_cipher_ctx);
+#else
     mbedtls_cipher_context_t MBEDTLS_PRIVATE(cipher_ctx);
-    uint64_t MBEDTLS_PRIVATE(HL)[16];
-    uint64_t MBEDTLS_PRIVATE(HH)[16];
+#endif
+    uint64_t MBEDTLS_PRIVATE(H)[MBEDTLS_GCM_HTABLE_SIZE][2];
     uint64_t MBEDTLS_PRIVATE(len);
     uint64_t MBEDTLS_PRIVATE(add_len);
     unsigned char MBEDTLS_PRIVATE(base_ectr)[16];
     unsigned char MBEDTLS_PRIVATE(y)[16];
     unsigned char MBEDTLS_PRIVATE(buf)[16];
-    int MBEDTLS_PRIVATE(mode);
+    unsigned char MBEDTLS_PRIVATE(mode);
+    unsigned char MBEDTLS_PRIVATE(acceleration);
 }
 mbedtls_gcm_context;
+
+#else  /* !MBEDTLS_GCM_ALT */
+#include "gcm_alt.h"
+#endif /* !MBEDTLS_GCM_ALT */
+
 
 void mbedtls_gcm_init(mbedtls_gcm_context *ctx);
 

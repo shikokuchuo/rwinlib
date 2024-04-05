@@ -17,7 +17,6 @@
 #include "mbedtls/build_info.h"
 
 #include "mbedtls/asn1.h"
-#include "mbedtls/x509.h"
 #include "mbedtls/x509_crt.h"
 
 #define MBEDTLS_ERR_PKCS7_INVALID_FORMAT                   -0x5300
