@@ -40,8 +40,7 @@
 
 #if !defined(MBEDTLS_MPI_WINDOW_SIZE)
 
-#define MBEDTLS_MPI_WINDOW_SIZE                           3
-
+#define MBEDTLS_MPI_WINDOW_SIZE                           2
 #endif /* !MBEDTLS_MPI_WINDOW_SIZE */
 
 #if !defined(MBEDTLS_MPI_MAX_SIZE)

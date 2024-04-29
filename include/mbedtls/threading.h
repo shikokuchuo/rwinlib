@@ -26,7 +26,7 @@ extern "C" {
 #include <pthread.h>
 typedef struct mbedtls_threading_mutex_t {
     pthread_mutex_t MBEDTLS_PRIVATE(mutex);
-    char MBEDTLS_PRIVATE(state);
+    char MBEDTLS_PRIVATE(is_valid);
 } mbedtls_threading_mutex_t;
 #endif
 
@@ -57,15 +57,6 @@ extern mbedtls_threading_mutex_t mbedtls_threading_readdir_mutex;
 
 extern mbedtls_threading_mutex_t mbedtls_threading_gmtime_mutex;
 #endif /* MBEDTLS_HAVE_TIME_DATE && !MBEDTLS_PLATFORM_GMTIME_R_ALT */
-
-#if defined(MBEDTLS_PSA_CRYPTO_C)
-
-extern mbedtls_threading_mutex_t mbedtls_threading_key_slot_mutex;
-
-extern mbedtls_threading_mutex_t mbedtls_threading_psa_globaldata_mutex;
-
-extern mbedtls_threading_mutex_t mbedtls_threading_psa_rngdata_mutex;
-#endif
 
 #endif /* MBEDTLS_THREADING_C */
 

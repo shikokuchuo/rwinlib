@@ -40,10 +40,6 @@
 
 #include "mbedtls/cipher.h"
 
-#if defined(MBEDTLS_BLOCK_CIPHER_C)
-#include "mbedtls/block_cipher.h"
-#endif
-
 #define MBEDTLS_CCM_DECRYPT       0
 #define MBEDTLS_CCM_ENCRYPT       1
 #define MBEDTLS_CCM_STAR_DECRYPT  2
@@ -65,13 +61,8 @@ typedef struct mbedtls_ccm_context {
     size_t MBEDTLS_PRIVATE(processed);
     unsigned int MBEDTLS_PRIVATE(q);
     unsigned int MBEDTLS_PRIVATE(mode);
-#if defined(MBEDTLS_BLOCK_CIPHER_C)
-    mbedtls_block_cipher_context_t MBEDTLS_PRIVATE(block_cipher_ctx);
-#else
     mbedtls_cipher_context_t MBEDTLS_PRIVATE(cipher_ctx);
-#endif
     int MBEDTLS_PRIVATE(state);
-
 }
 mbedtls_ccm_context;
 

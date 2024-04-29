@@ -54,12 +54,9 @@ int mbedtls_aria_setkey_enc(mbedtls_aria_context *ctx,
                             const unsigned char *key,
                             unsigned int keybits);
 
-#if !defined(MBEDTLS_BLOCK_CIPHER_NO_DECRYPT)
-
 int mbedtls_aria_setkey_dec(mbedtls_aria_context *ctx,
                             const unsigned char *key,
                             unsigned int keybits);
-#endif /* !MBEDTLS_BLOCK_CIPHER_NO_DECRYPT */
 
 int mbedtls_aria_crypt_ecb(mbedtls_aria_context *ctx,
                            const unsigned char input[MBEDTLS_ARIA_BLOCKSIZE],

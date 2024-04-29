@@ -30,9 +30,7 @@ typedef struct mbedtls_sha256_context {
     unsigned char MBEDTLS_PRIVATE(buffer)[64];
     uint32_t MBEDTLS_PRIVATE(total)[2];
     uint32_t MBEDTLS_PRIVATE(state)[8];
-#if defined(MBEDTLS_SHA224_C)
     int MBEDTLS_PRIVATE(is224);
-#endif
 }
 mbedtls_sha256_context;
 

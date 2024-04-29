@@ -73,7 +73,7 @@ int mbedtls_net_bind(mbedtls_net_context *ctx, const char *bind_ip, const char *
 
 int mbedtls_net_accept(mbedtls_net_context *bind_ctx,
                        mbedtls_net_context *client_ctx,
-                       void *client_ip, size_t buf_size, size_t *cip_len);
+                       void *client_ip, size_t buf_size, size_t *ip_len);
 
 int mbedtls_net_poll(mbedtls_net_context *ctx, uint32_t rw, uint32_t timeout);
 

@@ -24,7 +24,6 @@
 #include "mbedtls/private_access.h"
 
 #include "mbedtls/build_info.h"
-#include "mbedtls/platform_util.h"
 
 #include "mbedtls/bignum.h"
 
@@ -350,36 +349,15 @@ int mbedtls_ecp_gen_key(mbedtls_ecp_group_id grp_id, mbedtls_ecp_keypair *key,
                         int (*f_rng)(void *, unsigned char *, size_t),
                         void *p_rng);
 
-int mbedtls_ecp_set_public_key(mbedtls_ecp_group_id grp_id,
-                               mbedtls_ecp_keypair *key,
-                               const mbedtls_ecp_point *Q);
-
 int mbedtls_ecp_read_key(mbedtls_ecp_group_id grp_id, mbedtls_ecp_keypair *key,
                          const unsigned char *buf, size_t buflen);
 
-#if !defined(MBEDTLS_DEPRECATED_REMOVED)
-
-int MBEDTLS_DEPRECATED mbedtls_ecp_write_key(mbedtls_ecp_keypair *key,
-                                             unsigned char *buf, size_t buflen);
-#endif /* MBEDTLS_DEPRECATED_REMOVED */
-
-int mbedtls_ecp_write_key_ext(const mbedtls_ecp_keypair *key,
-                              size_t *olen, unsigned char *buf, size_t buflen);
-
-int mbedtls_ecp_write_public_key(const mbedtls_ecp_keypair *key,
-                                 int format, size_t *olen,
-                                 unsigned char *buf, size_t buflen);
+int mbedtls_ecp_write_key(mbedtls_ecp_keypair *key,
+                          unsigned char *buf, size_t buflen);
 
 int mbedtls_ecp_check_pub_priv(
     const mbedtls_ecp_keypair *pub, const mbedtls_ecp_keypair *prv,
     int (*f_rng)(void *, unsigned char *, size_t), void *p_rng);
-
-int mbedtls_ecp_keypair_calc_public(
-    mbedtls_ecp_keypair *key,
-    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng);
-
-mbedtls_ecp_group_id mbedtls_ecp_keypair_get_group_id(
-    const mbedtls_ecp_keypair *key);
 
 int mbedtls_ecp_export(const mbedtls_ecp_keypair *key, mbedtls_ecp_group *grp,
                        mbedtls_mpi *d, mbedtls_ecp_point *Q);

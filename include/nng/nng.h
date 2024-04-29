@@ -195,10 +195,6 @@ NNG_DECL int nng_socket_get_ptr(nng_socket, const char *, void **);
 NNG_DECL int nng_socket_get_ms(nng_socket, const char *, nng_duration *);
 NNG_DECL int nng_socket_get_addr(nng_socket, const char *, nng_sockaddr *);
 
-#define NNG_MAXADDRSTRLEN (NNG_MAXADDRLEN + 16) // extra bytes for scheme
-NNG_DECL const char *nng_str_sockaddr(
-    const nng_sockaddr *sa, char *buf, size_t bufsz);
-
 typedef enum {
 	NNG_PIPE_EV_ADD_PRE,  // Called just before pipe added to socket
 	NNG_PIPE_EV_ADD_POST, // Called just after pipe added to socket
@@ -371,7 +367,7 @@ NNG_DECL bool nng_aio_begin(nng_aio *);
 
 NNG_DECL void nng_aio_finish(nng_aio *, int);
 
-typedef void (*nng_aio_cancelfn)(nng_aio *, void *, int);
+typedef void  (*nng_aio_cancelfn)(nng_aio *, void *, int);
 
 NNG_DECL void nng_aio_defer(nng_aio *, nng_aio_cancelfn, void *);
 
@@ -763,58 +759,6 @@ enum {
 	NNG_INIT_MAX_EXPIRE_THREADS,
 	NNG_INIT_MAX_POLLER_THREADS,
 };
-
-typedef enum nng_log_level {
-	NNG_LOG_NONE   = 0, // used for filters only, NNG suppresses these
-	NNG_LOG_ERR    = 3,
-	NNG_LOG_WARN   = 4,
-	NNG_LOG_NOTICE = 5,
-	NNG_LOG_INFO   = 6,
-	NNG_LOG_DEBUG  = 7
-} nng_log_level;
-
-typedef enum nng_log_facility {
-	NNG_LOG_USER   = 1,
-	NNG_LOG_DAEMON = 3,
-	NNG_LOG_AUTH   = 10, // actually AUTHPRIV, for sensitive logs
-	NNG_LOG_LOCAL0 = 16,
-	NNG_LOG_LOCAL1 = 17,
-	NNG_LOG_LOCAL2 = 18,
-	NNG_LOG_LOCAL3 = 19,
-	NNG_LOG_LOCAL4 = 20,
-	NNG_LOG_LOCAL5 = 21,
-	NNG_LOG_LOCAL6 = 22,
-	NNG_LOG_LOCAL7 = 23,
-} nng_log_facility;
-
-typedef void (*nng_logger)(nng_log_level level, nng_log_facility facility,
-    const char *msgid, const char *msg);
-
-NNG_DECL void nng_null_logger(
-    nng_log_level, nng_log_facility, const char *, const char *);
-
-NNG_DECL void nng_stderr_logger(
-    nng_log_level, nng_log_facility, const char *, const char *);
-
-NNG_DECL void nng_system_logger(
-    nng_log_level, nng_log_facility, const char *, const char *);
-
-NNG_DECL void nng_log_set_facility(nng_log_facility facility);
-
-NNG_DECL void nng_log_set_level(nng_log_level level);
-
-NNG_DECL nng_log_level nng_log_get_level(void);
-
-NNG_DECL void nng_log_set_logger(nng_logger logger);
-
-NNG_DECL void nng_log_err(const char *msgid, const char *msg, ...);
-NNG_DECL void nng_log_warn(const char *msgid, const char *msg, ...);
-NNG_DECL void nng_log_notice(const char *msgid, const char *msg, ...);
-NNG_DECL void nng_log_info(const char *msgid, const char *msg, ...);
-NNG_DECL void nng_log_debug(const char *msgid, const char *msg, ...);
-
-NNG_DECL void nng_log_auth(
-    nng_log_level level, const char *msgid, const char *msg, ...);
 
 #ifdef __cplusplus
 }

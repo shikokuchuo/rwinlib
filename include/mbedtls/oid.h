@@ -229,9 +229,6 @@
         MBEDTLS_OID_OIW_SECSIG_ALG "\x07"
 #define MBEDTLS_OID_DES_EDE3_CBC                MBEDTLS_OID_RSA_COMPANY "\x03\x07"
 #define MBEDTLS_OID_AES                         MBEDTLS_OID_NIST_ALG "\x01"
-#define MBEDTLS_OID_AES_128_CBC                 MBEDTLS_OID_AES "\x02"
-#define MBEDTLS_OID_AES_192_CBC                 MBEDTLS_OID_AES "\x16"
-#define MBEDTLS_OID_AES_256_CBC                 MBEDTLS_OID_AES "\x2a"
 
 #define MBEDTLS_OID_AES128_KW                   MBEDTLS_OID_AES "\x05"
 #define MBEDTLS_OID_AES128_KWP                  MBEDTLS_OID_AES "\x08"
@@ -377,13 +374,13 @@ int mbedtls_oid_get_oid_by_md(mbedtls_md_type_t md_alg, const char **oid, size_t
 #if defined(MBEDTLS_CIPHER_C)
 
 int mbedtls_oid_get_cipher_alg(const mbedtls_asn1_buf *oid, mbedtls_cipher_type_t *cipher_alg);
+#endif /* MBEDTLS_CIPHER_C */
 
 #if defined(MBEDTLS_PKCS12_C)
 
 int mbedtls_oid_get_pkcs12_pbe_alg(const mbedtls_asn1_buf *oid, mbedtls_md_type_t *md_alg,
                                    mbedtls_cipher_type_t *cipher_alg);
 #endif /* MBEDTLS_PKCS12_C */
-#endif /* MBEDTLS_CIPHER_C */
 
 #ifdef __cplusplus
 }

@@ -411,13 +411,6 @@ psa_status_t psa_key_derivation_output_key(
     psa_key_derivation_operation_t *operation,
     mbedtls_svc_key_id_t *key);
 
-psa_status_t psa_key_derivation_output_key_ext(
-    const psa_key_attributes_t *attributes,
-    psa_key_derivation_operation_t *operation,
-    const psa_key_production_parameters_t *params,
-    size_t params_data_length,
-    mbedtls_svc_key_id_t *key);
-
 psa_status_t psa_key_derivation_verify_bytes(
     psa_key_derivation_operation_t *operation,
     const uint8_t *expected_output,
@@ -443,11 +436,6 @@ psa_status_t psa_generate_random(uint8_t *output,
 
 psa_status_t psa_generate_key(const psa_key_attributes_t *attributes,
                               mbedtls_svc_key_id_t *key);
-
-psa_status_t psa_generate_key_ext(const psa_key_attributes_t *attributes,
-                                  const psa_key_production_parameters_t *params,
-                                  size_t params_data_length,
-                                  mbedtls_svc_key_id_t *key);
 
 typedef struct psa_sign_hash_interruptible_operation_s psa_sign_hash_interruptible_operation_t;
 

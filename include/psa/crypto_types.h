@@ -21,7 +21,8 @@
 #ifndef PSA_CRYPTO_TYPES_H
 #define PSA_CRYPTO_TYPES_H
 
-#include "psa/build_info.h"
+#include "mbedtls/build_info.h"
+
 #include "mbedtls/private_access.h"
 
 #if defined(MBEDTLS_PSA_CRYPTO_PLATFORM_FILE)
@@ -77,7 +78,5 @@ typedef uint64_t psa_key_slot_number_t;
 #endif /* !__DOXYGEN_ONLY__ */
 
 typedef uint16_t psa_key_derivation_step_t;
-
-typedef struct psa_key_production_parameters_s psa_key_production_parameters_t;
 
 #endif /* PSA_CRYPTO_TYPES_H */

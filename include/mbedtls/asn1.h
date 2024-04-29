@@ -104,8 +104,7 @@ typedef struct mbedtls_asn1_named_data {
 }
 mbedtls_asn1_named_data;
 
-#if defined(MBEDTLS_ASN1_PARSE_C) || defined(MBEDTLS_X509_CREATE_C) || \
-    defined(MBEDTLS_PSA_UTIL_HAVE_ECDSA)
+#if defined(MBEDTLS_ASN1_PARSE_C) || defined(MBEDTLS_X509_CREATE_C)
 
 int mbedtls_asn1_get_len(unsigned char **p,
                          const unsigned char *end,
@@ -114,7 +113,7 @@ int mbedtls_asn1_get_len(unsigned char **p,
 int mbedtls_asn1_get_tag(unsigned char **p,
                          const unsigned char *end,
                          size_t *len, int tag);
-#endif /* MBEDTLS_ASN1_PARSE_C || MBEDTLS_X509_CREATE_C || MBEDTLS_PSA_UTIL_HAVE_ECDSA */
+#endif /* MBEDTLS_ASN1_PARSE_C || MBEDTLS_X509_CREATE_C */
 
 #if defined(MBEDTLS_ASN1_PARSE_C)
 
@@ -180,10 +179,10 @@ void mbedtls_asn1_free_named_data_list(mbedtls_asn1_named_data **head);
 
 void mbedtls_asn1_free_named_data_list_shallow(mbedtls_asn1_named_data *name);
 
-#endif /* MBEDTLS_ASN1_PARSE_C */
-
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* MBEDTLS_ASN1_PARSE_C */
 
 #endif /* asn1.h */

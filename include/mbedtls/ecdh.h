@@ -99,8 +99,6 @@ typedef struct mbedtls_ecdh_context {
 }
 mbedtls_ecdh_context;
 
-mbedtls_ecp_group_id mbedtls_ecdh_get_grp_id(mbedtls_ecdh_context *ctx);
-
 int mbedtls_ecdh_can_do(mbedtls_ecp_group_id gid);
 
 int mbedtls_ecdh_gen_public(mbedtls_ecp_group *grp, mbedtls_mpi *d, mbedtls_ecp_point *Q,

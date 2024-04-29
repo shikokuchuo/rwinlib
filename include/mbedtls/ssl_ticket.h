@@ -40,7 +40,6 @@ typedef struct mbedtls_ssl_ticket_key {
 #if defined(MBEDTLS_HAVE_TIME)
     mbedtls_time_t MBEDTLS_PRIVATE(generation_time);
 #endif
-    uint32_t MBEDTLS_PRIVATE(lifetime);
 #if !defined(MBEDTLS_USE_PSA_CRYPTO)
     mbedtls_cipher_context_t MBEDTLS_PRIVATE(ctx);
 #else
