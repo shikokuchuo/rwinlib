@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 #define NNG_MAJOR_VERSION 1
-#define NNG_MINOR_VERSION 8
+#define NNG_MINOR_VERSION 9
 #define NNG_PATCH_VERSION 0
 #define NNG_RELEASE_SUFFIX \
 	"" // if non-empty (i.e. "pre"), this is a pre-release
