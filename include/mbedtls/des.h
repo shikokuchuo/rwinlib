@@ -33,6 +33,8 @@
 extern "C" {
 #endif
 
+#if !defined(MBEDTLS_DES_ALT)
+
 typedef struct mbedtls_des_context {
     uint32_t MBEDTLS_PRIVATE(sk)[32];
 }
@@ -42,6 +44,10 @@ typedef struct mbedtls_des3_context {
     uint32_t MBEDTLS_PRIVATE(sk)[96];
 }
 mbedtls_des3_context;
+
+#else  /* MBEDTLS_DES_ALT */
+#include "des_alt.h"
+#endif /* MBEDTLS_DES_ALT */
 
 void mbedtls_des_init(mbedtls_des_context *ctx);
 
@@ -120,4 +126,4 @@ void mbedtls_des_setkey(uint32_t SK[32],
 }
 #endif
 
-#endif /* des.h */
+#endif

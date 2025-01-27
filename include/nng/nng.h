@@ -44,10 +44,10 @@ extern "C" {
 #endif
 
 #define NNG_MAJOR_VERSION 1
-#define NNG_MINOR_VERSION 9
-#define NNG_PATCH_VERSION 0
-#define NNG_RELEASE_SUFFIX \
-	"" // if non-empty (i.e. "pre"), this is a pre-release
+#define NNG_MINOR_VERSION 10
+#define NNG_PATCH_VERSION 1
+// if non-empty (i.e. "pre"), this is a pre-release
+#define NNG_RELEASE_SUFFIX ""
 
 #define NNG_MAXADDRLEN (128)
 
@@ -195,6 +195,12 @@ NNG_DECL int nng_socket_get_ptr(nng_socket, const char *, void **);
 NNG_DECL int nng_socket_get_ms(nng_socket, const char *, nng_duration *);
 NNG_DECL int nng_socket_get_addr(nng_socket, const char *, nng_sockaddr *);
 
+NNG_DECL int nng_socket_proto_id(nng_socket id, uint16_t *);
+NNG_DECL int nng_socket_peer_id(nng_socket id, uint16_t *);
+NNG_DECL int nng_socket_proto_name(nng_socket id, const char **);
+NNG_DECL int nng_socket_peer_name(nng_socket id, const char **);
+NNG_DECL int nng_socket_raw(nng_socket, bool *);
+
 typedef enum {
 	NNG_PIPE_EV_ADD_PRE,  // Called just before pipe added to socket
 	NNG_PIPE_EV_ADD_POST, // Called just after pipe added to socket
@@ -305,7 +311,6 @@ NNG_DECL int nng_ctx_get_uint64(nng_ctx, const char *, uint64_t *);
 NNG_DECL int nng_ctx_get_string(nng_ctx, const char *, char **);
 NNG_DECL int nng_ctx_get_ptr(nng_ctx, const char *, void **);
 NNG_DECL int nng_ctx_get_ms(nng_ctx, const char *, nng_duration *);
-NNG_DECL int nng_ctx_get_addr(nng_ctx, const char *, nng_sockaddr *);
 
 NNG_DECL int nng_ctx_set(nng_ctx, const char *, const void *, size_t);
 NNG_DECL int nng_ctx_set_bool(nng_ctx, const char *, bool);
@@ -315,7 +320,6 @@ NNG_DECL int nng_ctx_set_uint64(nng_ctx, const char *, uint64_t);
 NNG_DECL int nng_ctx_set_string(nng_ctx, const char *, const char *);
 NNG_DECL int nng_ctx_set_ptr(nng_ctx, const char *, void *);
 NNG_DECL int nng_ctx_set_ms(nng_ctx, const char *, nng_duration);
-NNG_DECL int nng_ctx_set_addr(nng_ctx, const char *, const nng_sockaddr *);
 
 NNG_DECL void *nng_alloc(size_t);
 
@@ -657,8 +661,6 @@ NNG_DECL int  nng_stream_set_size(nng_stream *, const char *, size_t);
 NNG_DECL int  nng_stream_set_uint64(nng_stream *, const char *, uint64_t);
 NNG_DECL int  nng_stream_set_string(nng_stream *, const char *, const char *);
 NNG_DECL int  nng_stream_set_ptr(nng_stream *, const char *, void *);
-NNG_DECL int  nng_stream_set_addr(
-     nng_stream *, const char *, const nng_sockaddr *);
 
 NNG_DECL int nng_stream_dialer_alloc(nng_stream_dialer **, const char *);
 NNG_DECL int nng_stream_dialer_alloc_url(

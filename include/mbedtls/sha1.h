@@ -29,12 +29,17 @@
 extern "C" {
 #endif
 
+#if !defined(MBEDTLS_SHA1_ALT)
 typedef struct mbedtls_sha1_context {
     uint32_t MBEDTLS_PRIVATE(total)[2];
     uint32_t MBEDTLS_PRIVATE(state)[5];
     unsigned char MBEDTLS_PRIVATE(buffer)[64];
 }
 mbedtls_sha1_context;
+
+#else  /* MBEDTLS_SHA1_ALT */
+#include "sha1_alt.h"
+#endif /* MBEDTLS_SHA1_ALT */
 
 void mbedtls_sha1_init(mbedtls_sha1_context *ctx);
 
@@ -63,4 +68,4 @@ int mbedtls_sha1(const unsigned char *input,
 }
 #endif
 
-#endif /* mbedtls_sha1.h */
+#endif

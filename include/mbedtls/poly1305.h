@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/** Invalid input parameter(s). */
 #define MBEDTLS_ERR_POLY1305_BAD_INPUT_DATA         -0x0057
 
 #ifdef __cplusplus
@@ -35,11 +36,11 @@ extern "C" {
 #if !defined(MBEDTLS_POLY1305_ALT)
 
 typedef struct mbedtls_poly1305_context {
-    uint32_t MBEDTLS_PRIVATE(r)[4];
-    uint32_t MBEDTLS_PRIVATE(s)[4];
-    uint32_t MBEDTLS_PRIVATE(acc)[5];
-    uint8_t MBEDTLS_PRIVATE(queue)[16];
-    size_t MBEDTLS_PRIVATE(queue_len);
+    uint32_t MBEDTLS_PRIVATE(r)[4];      /** The value for 'r' (low 128 bits of the key). */
+    uint32_t MBEDTLS_PRIVATE(s)[4];      /** The value for 's' (high 128 bits of the key). */
+    uint32_t MBEDTLS_PRIVATE(acc)[5];    /** The accumulator number. */
+    uint8_t MBEDTLS_PRIVATE(queue)[16];  /** The current partial block of data. */
+    size_t MBEDTLS_PRIVATE(queue_len);   /** The number of bytes stored in 'queue'. */
 }
 mbedtls_poly1305_context;
 
@@ -70,4 +71,4 @@ int mbedtls_poly1305_mac(const unsigned char key[32],
 }
 #endif
 
-#endif /* MBEDTLS_POLY1305_H */
+#endif

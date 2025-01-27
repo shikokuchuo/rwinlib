@@ -68,6 +68,18 @@
 
 #endif /* MBEDTLS_DEBUG_C */
 
+/**
+ * \def MBEDTLS_PRINTF_ATTRIBUTE
+ *
+ * Mark a function as having printf attributes, and thus enable checking
+ * via -wFormat and other flags. This does nothing on builds with compilers
+ * that do not support the format attribute
+ *
+ * Module:  library/debug.c
+ * Caller:
+ *
+ * This module provides debugging functions.
+ */
 #if defined(__has_attribute)
 #if __has_attribute(format)
 #if defined(__MINGW32__) && __USE_MINGW_ANSI_STDIO == 1
@@ -84,6 +96,18 @@
 #define MBEDTLS_PRINTF_ATTRIBUTE(string_index, first_to_check)
 #endif
 
+/**
+ * \def MBEDTLS_PRINTF_SIZET
+ *
+ * MBEDTLS_PRINTF_xxx: Due to issues with older window compilers
+ * and MinGW we need to define the printf specifier for size_t
+ * and long long per platform.
+ *
+ * Module:  library/debug.c
+ * Caller:
+ *
+ * This module provides debugging functions.
+ */
 #if (defined(__MINGW32__) && __USE_MINGW_ANSI_STDIO == 0) || (defined(_MSC_VER) && _MSC_VER < 1800)
    #include <inttypes.h>
    #define MBEDTLS_PRINTF_SIZET     PRIuPTR
@@ -96,65 +120,37 @@
     /* (defined(__MINGW32__)  && __USE_MINGW_ANSI_STDIO == 0) || (defined(_MSC_VER) && _MSC_VER < 1800) */
 
 #if !defined(MBEDTLS_PRINTF_MS_TIME)
+#include <inttypes.h>
+#if !defined(PRId64)
+#define MBEDTLS_PRINTF_MS_TIME MBEDTLS_PRINTF_LONGLONG
+#else
 #define MBEDTLS_PRINTF_MS_TIME PRId64
+#endif
 #endif /* MBEDTLS_PRINTF_MS_TIME */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * \brief   Set the threshold error level to handle globally all debug output.
+ *          Debug messages that have a level over the threshold value are
+ *          discarded.
+ *          (Default value: 0 = No debug )
+ *
+ * \param threshold     threshold level of messages to filter on. Messages at a
+ *                      higher level will be discarded.
+ *                          - Debug levels
+ *                              - 0 No debug
+ *                              - 1 Error
+ *                              - 2 State change
+ *                              - 3 Informational
+ *                              - 4 Verbose
+ */
 void mbedtls_debug_set_threshold(int threshold);
-
-void mbedtls_debug_print_msg(const mbedtls_ssl_context *ssl, int level,
-                             const char *file, int line,
-                             const char *format, ...) MBEDTLS_PRINTF_ATTRIBUTE(5, 6);
-
-void mbedtls_debug_print_ret(const mbedtls_ssl_context *ssl, int level,
-                             const char *file, int line,
-                             const char *text, int ret);
-
-void mbedtls_debug_print_buf(const mbedtls_ssl_context *ssl, int level,
-                             const char *file, int line, const char *text,
-                             const unsigned char *buf, size_t len);
-
-#if defined(MBEDTLS_BIGNUM_C)
-
-void mbedtls_debug_print_mpi(const mbedtls_ssl_context *ssl, int level,
-                             const char *file, int line,
-                             const char *text, const mbedtls_mpi *X);
-#endif
-
-#if defined(MBEDTLS_ECP_C)
-
-void mbedtls_debug_print_ecp(const mbedtls_ssl_context *ssl, int level,
-                             const char *file, int line,
-                             const char *text, const mbedtls_ecp_point *X);
-#endif
-
-#if defined(MBEDTLS_X509_CRT_PARSE_C) && !defined(MBEDTLS_X509_REMOVE_INFO)
-
-void mbedtls_debug_print_crt(const mbedtls_ssl_context *ssl, int level,
-                             const char *file, int line,
-                             const char *text, const mbedtls_x509_crt *crt);
-#endif
-
-#if defined(MBEDTLS_KEY_EXCHANGE_SOME_ECDH_OR_ECDHE_ANY_ENABLED) && \
-    defined(MBEDTLS_ECDH_C)
-typedef enum {
-    MBEDTLS_DEBUG_ECDH_Q,
-    MBEDTLS_DEBUG_ECDH_QP,
-    MBEDTLS_DEBUG_ECDH_Z,
-} mbedtls_debug_ecdh_attr;
-
-void mbedtls_debug_printf_ecdh(const mbedtls_ssl_context *ssl, int level,
-                               const char *file, int line,
-                               const mbedtls_ecdh_context *ecdh,
-                               mbedtls_debug_ecdh_attr attr);
-#endif /* MBEDTLS_KEY_EXCHANGE_SOME_ECDH_OR_ECDHE_ANY_ENABLED &&
-          MBEDTLS_ECDH_C */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* debug.h */
+#endif /* MBEDTLS_DEBUG_H */
